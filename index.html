@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>POJ Handwriting Practice Generator</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="translations.js"></script>
+    <script src="fonts-iansui.js"></script>
+    <script src="fonts-openhuninn.js"></script>
+    <script src="fonts-chiayicity.js"></script>
+    <script src="fonts-lessonone.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif:ital,wght@0,400;0,700;1,400;1,700&display=swap"
+        rel="stylesheet">
+</head>
+
+<body>
+    <div class="container">
+        <header>
+            <div class="header-content">
+                <div class="header-text">
+                    <h1>POJ Handwriting Practice Generator</h1>
+                    <p>Generate PDF worksheets for Pe̍h-ōe-jī handwriting practice.</p>
+                </div>
+                <div class="language-switcher">
+                    <select id="languageSelect">
+                        <option value="en">English</option>
+                        <option value="poj">Pe̍h-ōe-jī</option>
+                    </select>
+                </div>
+            </div>
+        </header>
+
+        <main class="layout-container">
+            <div class="controls-column">
+                <div class="controls">
+                    <div class="settings-section">
+                        <h3>Text Settings</h3>
+                        <div class="text-settings-grid">
+                            <div class="form-group">
+                                <label for="pageTitle">Page Title:</label>
+                                <div class="input-with-clear">
+                                    <input type="text" id="pageTitle" placeholder="e.g., Handwriting Practice"
+                                        value="Liān-si̍p Siá Pe̍h-ōe-jī">
+                                    <button id="clearTitleBtn" class="clear-btn">Clear</button>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="inputText">Text to Practice:</label>
+                                <div class="input-with-clear">
+                                    <textarea id="inputText" rows="2"
+                                        placeholder="Enter text to practice...">Kin-á-ji̍t thiⁿ-khì chin hó.</textarea>
+                                    <button id="clearTextBtn" class="clear-btn">Clear</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="settings-section">
+                        <h3>Page Settings</h3>
+                        <div class="form-group">
+                            <label for="paperSize">Paper Size:</label>
+                            <select id="paperSize">
+                                <option value="a4" selected>A4 (210 x 297 mm)</option>
+                                <option value="a3">A3 (297 x 420 mm)</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="orientation">Orientation:</label>
+                            <select id="orientation">
+                                <option value="portrait">Portrait</option>
+                                <option value="landscape">Landscape</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="settings-section">
+                        <h3>Handwriting Settings</h3>
+                        <div class="form-group">
+                            <label for="fontSelect">Font:</label>
+                            <select id="fontSelect">
+                                <option value="Iansui-Regular.ttf" selected>Iansui</option>
+                                <option value="jf-openhuninn.ttf">Open Huninn</option>
+                                <option value="ChiayiCity.ttf">Chiayi City</option>
+                                <option value="LessonOne-Regular.ttf">Lesson One</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="practiceMode">Mode:</label>
+                            <select id="practiceMode">
+                                <option value="tracing" selected>Tracing (Text on every line)</option>
+                                <option value="copying">Copying (Text then blank line)</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="textStyle">Text Style:</label>
+                            <select id="textStyle">
+                                <option value="black">Solid Black</option>
+                                <option value="grey" selected>Grey (for Tracing)</option>
+                                <option value="light">Light Grey (for Tracing)</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="followingLines">Following Lines:</label>
+                            <select id="followingLines">
+                                <option value="fill">Fill with blanks</option>
+                                <option value="blank">Leave blank</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="guideStyle">Guides Style:</label>
+                            <select id="guideStyle">
+                                <option value="normal" selected>Normal (Grey)</option>
+                                <option value="light">Light (Light Grey)</option>
+                                <option value="none">None</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="lineHeight">Line Height (mm):</label>
+                            <input type="number" id="lineHeight" value="20" min="10" max="50">
+                        </div>
+                        <div class="form-group">
+                            <label for="verticalOffset">Vertical Offset (mm):</label>
+                            <input type="number" id="verticalOffset" value="0" min="-10" max="10" step="0.1">
+                        </div>
+                    </div>
+
+                    <button id="generateBtn" class="primary-btn">Generate PDF</button>
+                </div>
+            </div>
+
+            <div class="preview-column">
+                <div class="preview-section">
+                    <h2>Preview</h2>
+                    <div id="previewContainer">
+                        <canvas id="previewCanvas"></canvas>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <footer>
+            <a href="https://linktr.ee/taibunkesimi" target="_blank" class="footer-btn">Tâi-bûn Ke-si Mī</a>
+        </footer>
+    </div>
+    <script src="script.js?v=1.1"></script>
+</body>
+
+</html>
