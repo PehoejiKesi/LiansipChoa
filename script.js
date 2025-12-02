@@ -91,16 +91,17 @@ class LayoutEngine {
             fontFamily,
             pageTitle,
             practiceMode, // 'tracing' or 'copying'
-            followingLines, // 'fill' or 'blank'
-            verticalOffsetMm
+            followingLines // 'fill' or 'blank'
         } = settings;
 
         // 1. Setup Dimensions (in Points)
         const paperDimsMm = this.getPaperDimensionsMm(paperSize, orientation);
         const widthPt = paperDimsMm.width * MM_TO_PT;
         const heightPt = paperDimsMm.height * MM_TO_PT;
-        const marginMm = 20;
+        const marginMm = 15;
         const marginPt = marginMm * MM_TO_PT;
+        const bottomMarginMm = 10; // Allow drawing closer to bottom
+        const bottomMarginPt = bottomMarginMm * MM_TO_PT;
         const contentWidthPt = widthPt - (marginPt * 2);
 
         // Grid Settings
@@ -120,39 +121,43 @@ class LayoutEngine {
 
         const pages = [];
         let currentPage = { items: [], pageNumber: 1 };
-        let currentY = marginPt;
+
+        // Helper to add title and get start Y
+        const addTitleAndGetY = (page) => {
+            if (pageTitle && pageTitle.trim()) {
+                const titleFontSizePt = 32;
+                this.ctx.font = `bold ${titleFontSizePt}px "${fontFamily}"`;
+                const titleWidth = this.ctx.measureText(pageTitle).width;
+
+                // Move title higher into the margin (Decreased top space)
+                const titleY = marginPt - 20
+                page.items.push({
+                    type: 'title',
+                    text: pageTitle,
+                    x: widthPt / 2,
+                    y: titleY,
+                    width: titleWidth,
+                    fontSize: titleFontSizePt,
+                    font: fontFamily
+                });
+
+                // Reset font for body
+                this.ctx.font = `${fontSizePt}px "${fontFamily}"`;
+
+                // Decreased bottom space (gap between title and text)
+                return titleY + titleFontSizePt + 30;
+            }
+            return marginPt;
+        };
+
+        let currentY = addTitleAndGetY(currentPage);
 
         // Helper to add new page
         const startNewPage = () => {
             pages.push(currentPage);
             currentPage = { items: [], pageNumber: pages.length + 1 };
-            currentY = marginPt;
+            currentY = addTitleAndGetY(currentPage);
         };
-
-        // 2. Render Title
-        if (pageTitle && pageTitle.trim()) {
-            const titleFontSizePt = 32; // Increased from 24
-            this.ctx.font = `bold ${titleFontSizePt}px "${fontFamily}"`;
-            const titleWidth = this.ctx.measureText(pageTitle).width;
-
-            // Move title higher into the margin
-            const titleY = marginPt - 30;
-
-            currentPage.items.push({
-                type: 'title',
-                text: pageTitle,
-                x: widthPt / 2, // Center X
-                y: titleY,
-                width: titleWidth, // Store width for PDF centering
-                fontSize: titleFontSizePt,
-                font: fontFamily
-            });
-            // Add more spacing between title and first line
-            currentY = titleY + (titleFontSizePt * 2);
-
-            // Reset font for body
-            this.ctx.font = `${fontSizePt}px "${fontFamily}"`;
-        }
 
         // 3. Process Text
         const paragraphs = this.normalizeText(text).split('\n');
@@ -172,21 +177,22 @@ class LayoutEngine {
 
                 if (metrics.width > availableTextWidth && currentLineWords.length > 0) {
                     // Line full, push currentLine
-                    this.addLineToPage(currentPage, currentLineWords.join(' '), currentY, marginPt, contentWidthPt, gridHeightPt, fontSizePt, fontFamily, verticalOffsetMm, settings, textPaddingPt);
-                    currentY += rowHeightPt;
 
-                    // Check pagination
-                    if (currentY + rowHeightPt > heightPt - marginPt) {
+                    // Check pagination BEFORE adding
+                    if (currentY + gridHeightPt > heightPt - bottomMarginPt) {
                         startNewPage();
                     }
 
+                    this.addLineToPage(currentPage, currentLineWords.join(' '), currentY, marginPt, contentWidthPt, gridHeightPt, fontSizePt, fontFamily, settings, textPaddingPt);
+                    currentY += rowHeightPt;
+
                     // If Copying mode, add empty line
                     if (practiceMode === 'copying') {
-                        this.addLineToPage(currentPage, '', currentY, marginPt, contentWidthPt, gridHeightPt, fontSizePt, fontFamily, verticalOffsetMm, settings, textPaddingPt);
-                        currentY += rowHeightPt;
-                        if (currentY + rowHeightPt > heightPt - marginPt) {
+                        if (currentY + gridHeightPt > heightPt - bottomMarginPt) {
                             startNewPage();
                         }
+                        this.addLineToPage(currentPage, '', currentY, marginPt, contentWidthPt, gridHeightPt, fontSizePt, fontFamily, settings, textPaddingPt);
+                        currentY += rowHeightPt;
                     }
 
                     currentLineWords = [word];
@@ -197,35 +203,38 @@ class LayoutEngine {
 
             // Push remaining words
             if (currentLineWords.length > 0) {
-                this.addLineToPage(currentPage, currentLineWords.join(' '), currentY, marginPt, contentWidthPt, gridHeightPt, fontSizePt, fontFamily, verticalOffsetMm, settings, textPaddingPt);
-                currentY += rowHeightPt;
-
-                if (currentY + rowHeightPt > heightPt - marginPt) {
+                if (currentY + gridHeightPt > heightPt - bottomMarginPt) {
                     startNewPage();
                 }
+                this.addLineToPage(currentPage, currentLineWords.join(' '), currentY, marginPt, contentWidthPt, gridHeightPt, fontSizePt, fontFamily, settings, textPaddingPt);
+                currentY += rowHeightPt;
 
                 if (practiceMode === 'copying') {
-                    this.addLineToPage(currentPage, '', currentY, marginPt, contentWidthPt, gridHeightPt, fontSizePt, fontFamily, verticalOffsetMm, settings, textPaddingPt);
-                    currentY += rowHeightPt;
-                    if (currentY + rowHeightPt > heightPt - marginPt) {
+                    if (currentY + gridHeightPt > heightPt - bottomMarginPt) {
                         startNewPage();
                     }
+                    this.addLineToPage(currentPage, '', currentY, marginPt, contentWidthPt, gridHeightPt, fontSizePt, fontFamily, settings, textPaddingPt);
+                    currentY += rowHeightPt;
                 }
             }
         });
 
-        // 4. Fill remaining lines
-        if (followingLines === 'fill') {
+        // 4. Fill remaining lines on current page only
+        // If there's no content at all, add at least one line to show something
+        if (currentPage.items.length === 0 || (followingLines === 'fill' && currentPage.items.length > 0)) {
             // Safety break
             let safety = 0;
-            while (currentY + rowHeightPt <= heightPt - marginPt && safety < 100) {
-                this.addLineToPage(currentPage, '', currentY, marginPt, contentWidthPt, gridHeightPt, fontSizePt, fontFamily, verticalOffsetMm, settings, textPaddingPt);
+            while (currentY + gridHeightPt <= heightPt - bottomMarginPt && safety < 100) {
+                this.addLineToPage(currentPage, '', currentY, marginPt, contentWidthPt, gridHeightPt, fontSizePt, fontFamily, settings, textPaddingPt);
                 currentY += rowHeightPt;
                 safety++;
             }
         }
 
-        pages.push(currentPage);
+        // Only push the current page if it has content
+        if (currentPage.items.length > 0) {
+            pages.push(currentPage);
+        }
 
         return {
             pages,
@@ -234,7 +243,7 @@ class LayoutEngine {
         };
     }
 
-    addLineToPage(page, text, y, x, width, height, fontSize, font, verticalOffsetMm, settings, textPaddingPt = 0) {
+    addLineToPage(page, text, y, x, width, height, fontSize, font, settings, textPaddingPt = 0) {
         // 4-Line Guide System Layout:
         // Line 1 (top):    y + 0
         // Line 2:          y + height * 0.25
@@ -258,10 +267,8 @@ class LayoutEngine {
             // - Baseline should be at Line 3 (0.5)
             // - Font size is 50% of grid height (distance from Line 1 to Line 3)
 
-            const vOffsetPt = verticalOffsetMm * MM_TO_PT;
-
             // Calculate baseline Y position (at Line 3)
-            const baselineY = y + (height * 0.5) + vOffsetPt;
+            const baselineY = y + (height * 0.5);
 
             // Measure text metrics for PDF rendering
             this.ctx.font = `${fontSize}px "${font}"`;
@@ -342,6 +349,9 @@ function renderPreview(layout, canvasId) {
                 drawTitleOnCanvas(ctx, item, scale, pageY);
             }
         });
+
+        // Draw Footer
+        drawFooterOnCanvas(ctx, layout.widthPt, layout.heightPt, scale, pageY);
 
         pageY += (layout.heightPt * scale) + pageGap;
     });
@@ -427,6 +437,18 @@ function drawTitleOnCanvas(ctx, item, scale, pageOffsetY) {
     ctx.textAlign = 'left'; // Reset
 }
 
+function drawFooterOnCanvas(ctx, pageWidthPt, pageHeightPt, scale, pageOffsetY) {
+    const x = (pageWidthPt / 2) * scale;
+    const y = (pageHeightPt - 10) * scale + pageOffsetY; // Closer to bottom
+
+    ctx.font = `${16 * scale}px "Iansui"`;
+    ctx.fillStyle = '#999';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'bottom';
+    ctx.fillText('kesi.poj.tw © Tâi-bûn Ke-si Mī', x, y);
+    ctx.textAlign = 'left'; // Reset
+}
+
 function generatePDF(layout) {
     const docContent = [];
 
@@ -458,11 +480,18 @@ function generatePDF(layout) {
                 if (item.color === 'grey') color = '#999';
                 else if (item.color === 'light') color = '#dcdcdc';
 
-                // For text, absolutePosition places the top-left of the text box.
-                // We have the BASELINE y stored in item.y.
-                // We need to shift UP by the ascent to get the top y.
-                // Using fontSize + small offset to position text higher
-                const topY = item.y - item.fontSize - 2;
+                // pdfmake positions text from top-left, but we have baseline Y
+                // Each font renders differently in pdfmake vs canvas, so we need font-specific corrections
+                const fontCorrectionFactors = {
+                    'LessonOne': 1.38,
+                    'OpenHuninn': 1.18,
+                    'Iansui': 1.20,
+                    'ChiayiCity': 1.22,
+                };
+
+                const correctionFactor = fontCorrectionFactors[item.font] || 0.95;
+                const correctedAscent = item.ascent * correctionFactor;
+                const topY = item.y - correctedAscent;
 
                 docContent.push({
                     text: item.text,
@@ -488,14 +517,23 @@ function generatePDF(layout) {
 
     const docDefinition = {
         pageSize: { width: layout.widthPt, height: layout.heightPt },
-        pageMargins: [0, 0, 0, 0], // We handle margins
+        pageMargins: [0, 0, 0, 20], // Bottom margin for footer
         content: docContent,
         defaultStyle: {
             font: 'Iansui' // Default
+        },
+        footer: function (currentPage, pageCount) {
+            return {
+                text: 'kesi.poj.tw © Tâi-bûn Ke-si Mī',
+                alignment: 'center',
+                fontSize: 16,
+                color: '#999',
+                margin: [0, 0, 0, 0] // Top margin 0 to align with preview (approx 20pt from bottom)
+            };
         }
     };
 
-    pdfMake.createPdf(docDefinition).download('poj-practice.pdf');
+    pdfMake.createPdf(docDefinition).download('POJ_Liansip_Choa.pdf');
 }
 
 // --- Main Integration ---
@@ -514,8 +552,8 @@ document.addEventListener('DOMContentLoaded', () => {
         followingLines: document.getElementById('followingLines'),
         guideStyle: document.getElementById('guideStyle'),
         textStyle: document.getElementById('textStyle'),
-        verticalOffset: document.getElementById('verticalOffset'),
         languageSelect: document.getElementById('languageSelect'),
+        presetSelect: document.getElementById('presetSelect'),
         clearTitleBtn: document.getElementById('clearTitleBtn'),
         clearTextBtn: document.getElementById('clearTextBtn')
     };
@@ -525,7 +563,15 @@ document.addEventListener('DOMContentLoaded', () => {
         ui.languageSelect.value = currentLanguage;
         updateUILanguage();
     }
-    ui.languageSelect.addEventListener('change', (e) => switchLanguage(e.target.value));
+    ui.languageSelect.addEventListener('change', (e) => {
+        switchLanguage(e.target.value);
+        // Update preset title when language changes
+        const currentPreset = ui.presetSelect.value;
+        if (currentPreset !== 'custom' && PRESETS[currentPreset]) {
+            const lang = e.target.value;
+            ui.pageTitle.value = PRESETS[currentPreset].title[lang] || PRESETS[currentPreset].title.poj;
+        }
+    });
 
     // Clear Buttons
     if (ui.clearTitleBtn) ui.clearTitleBtn.addEventListener('click', () => { ui.pageTitle.value = ''; update(); });
@@ -544,7 +590,7 @@ document.addEventListener('DOMContentLoaded', () => {
             followingLines: ui.followingLines.value,
             guideStyle: ui.guideStyle.value,
             textStyle: ui.textStyle.value,
-            verticalOffsetMm: parseFloat(ui.verticalOffset.value) || 0
+
         };
 
         // Create a dummy canvas for measurement
@@ -563,13 +609,40 @@ document.addEventListener('DOMContentLoaded', () => {
     const inputs = [
         ui.inputText, ui.paperSize, ui.lineHeight, ui.fontSelect,
         ui.pageTitle, ui.orientation, ui.practiceMode, ui.followingLines,
-        ui.guideStyle, ui.textStyle, ui.verticalOffset
+        ui.guideStyle, ui.textStyle
     ];
     inputs.forEach(input => {
         if (input) input.addEventListener('input', update);
     });
 
-    // Generate PDF
+    // Preset Selection Handler
+    ui.presetSelect.addEventListener('change', (e) => {
+        const val = e.target.value;
+        if (val !== 'custom' && PRESETS[val]) {
+            const preset = PRESETS[val];
+            ui.inputText.value = preset.text;
+            // Set title based on current language
+            const lang = currentLanguage || 'poj';
+            ui.pageTitle.value = preset.title[lang] || preset.title.poj;
+            update();
+        }
+    });
+
+    // Detect custom input
+    ui.inputText.addEventListener('input', () => {
+        const currentText = ui.inputText.value;
+        let match = false;
+        for (const [key, preset] of Object.entries(PRESETS)) {
+            if (currentText === preset.text) {
+                ui.presetSelect.value = key;
+                match = true;
+                break;
+            }
+        }
+        if (!match) {
+            ui.presetSelect.value = 'custom';
+        }
+    });
     ui.generateBtn.addEventListener('click', () => {
         if (window.currentLayout) {
             ui.generateBtn.textContent = 'Generating...';
@@ -589,6 +662,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Initial Load
     loadPreviewFonts().then(() => {
+        // Load default preset on initial page load
+        const initialPreset = ui.presetSelect.value;
+        if (initialPreset !== 'custom' && PRESETS[initialPreset]) {
+            const preset = PRESETS[initialPreset];
+            ui.inputText.value = preset.text;
+            const lang = currentLanguage || 'poj';
+            ui.pageTitle.value = preset.title[lang] || preset.title.poj;
+        }
         update();
     });
 });

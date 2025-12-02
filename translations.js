@@ -11,6 +11,12 @@ const translations = {
         // Text Settings Section
         textSettings: "Text Settings",
         pageTitle: "Page Title:",
+        preset: "Preset:",
+        presetEmpty: "Empty",
+        presetDefault: "Default",
+        presetVowels: "Vowels (A, I, U, O͘, E, O)",
+        presetConsonants: "Consonants (P, Ph, M, B...)",
+        presetTones: "Tone Marks (A, Á, À, Ah...)",
         pageTitlePlaceholder: "e.g., Handwriting Practice",
         textToPractice: "Text to Practice:",
         textPlaceholder: "Enter text to practice...",
@@ -46,10 +52,11 @@ const translations = {
         textStyleBlack: "Solid Black",
         textStyleGrey: "Grey (for Tracing)",
         textStyleLight: "Light Grey (for Tracing)",
-        verticalOffset: "Vertical Offset (mm):",
+
 
         // Buttons
         generatePDF: "Generate PDF",
+        clearButton: "Clear",
 
         // Preview
         preview: "Preview"
@@ -66,7 +73,13 @@ const translations = {
         // Text Settings Section
         textSettings: "Beh Siá Siáⁿ",
         pageTitle: "Phiau-tê (Ē-sái bián):",
-        pageTitlePlaceholder: "Lē: \"Liān-si̍p siá jī\"",
+        preset: "Kiàn-pún:",
+        presetEmpty: "Khang--ê",
+        presetDefault: "Chiàu-goân",
+        presetVowels: "Bó-im (A, I, U, O͘, E, O)",
+        presetConsonants: "Chú-im (P, Ph, M, B...)",
+        presetTones: "Siaⁿ-tiāu (A, Á, À, Ah...)",
+        pageTitlePlaceholder: "Lē: \"Liān-si̍p Siá Pe̍h-ōe-jī\"",
         textToPractice: "Beh Liān-si̍p Siá Siáⁿ:",
         textPlaceholder: "Tī chia phah jī...",
 
@@ -80,7 +93,7 @@ const translations = {
         orientationLandscape: "Hoâiⁿ--ê",
 
         // Handwriting Settings
-        handwritingSettings: "Keh-sek Siáⁿ Khoán--ê",
+        handwritingSettings: "Keh-sek Siáⁿ Khoán",
         font: "Jī-thé:",
         fontIansui: "Iansui",
         fontOpenHuninn: "Open Huninn",
@@ -101,18 +114,19 @@ const translations = {
         guideStyleLight: "Khah Chhián (Chhián Phú--ê)",
         guideStyleNone: "Bián Sòaⁿ",
         lineHeight: "1 Chōa Gōa Koân (mm):",
-        verticalOffset: "Téng-ē Sóa Ūi (mm):",
+
 
         // Buttons
         generatePDF: "Chò PDF Tòng-àn",
+        clearButton: "Têng-lâi",
 
         // Preview
         preview: "Ē Seⁿ Chò Án-ne"
     }
 };
 
-// Get current language from localStorage or default to English
-let currentLanguage = localStorage.getItem('pojLang') || 'en';
+// Get current language from localStorage or default to POJ
+let currentLanguage = localStorage.getItem('pojLang') || 'poj';
 
 // Function to get translated text
 function t(key) {
@@ -138,6 +152,12 @@ function updateUILanguage() {
     // Text Settings
     document.querySelectorAll('.settings-section h3')[0].textContent = t('textSettings');
     document.querySelector('label[for="pageTitle"]').textContent = t('pageTitle');
+    document.querySelector('label[for="presetSelect"]').textContent = t('preset');
+    document.querySelectorAll('#presetSelect option')[0].textContent = t('presetEmpty');
+    document.querySelectorAll('#presetSelect option')[1].textContent = t('presetDefault');
+    document.querySelectorAll('#presetSelect option')[2].textContent = t('presetVowels');
+    document.querySelectorAll('#presetSelect option')[3].textContent = t('presetConsonants');
+    document.querySelectorAll('#presetSelect option')[4].textContent = t('presetTones');
     document.getElementById('pageTitle').placeholder = t('pageTitlePlaceholder');
     document.querySelector('label[for="inputText"]').textContent = t('textToPractice');
     document.getElementById('inputText').placeholder = t('textPlaceholder');
@@ -154,10 +174,10 @@ function updateUILanguage() {
     // Handwriting Settings
     document.querySelectorAll('.settings-section h3')[2].textContent = t('handwritingSettings');
     document.querySelector('label[for="fontSelect"]').textContent = t('font');
-    document.querySelectorAll('#fontSelect option')[0].textContent = t('fontIansui');
+    document.querySelectorAll('#fontSelect option')[0].textContent = t('fontLessonOne');
     document.querySelectorAll('#fontSelect option')[1].textContent = t('fontOpenHuninn');
-    document.querySelectorAll('#fontSelect option')[2].textContent = t('fontChiayiCity');
-    document.querySelectorAll('#fontSelect option')[3].textContent = t('fontLessonOne');
+    document.querySelectorAll('#fontSelect option')[2].textContent = t('fontIansui');
+    document.querySelectorAll('#fontSelect option')[3].textContent = t('fontChiayiCity');
     document.querySelector('label[for="practiceMode"]').textContent = t('mode');
     document.querySelectorAll('#practiceMode option')[0].textContent = t('modeTracing');
     document.querySelectorAll('#practiceMode option')[1].textContent = t('modeCopying');
@@ -173,10 +193,12 @@ function updateUILanguage() {
     document.querySelectorAll('#textStyle option')[0].textContent = t('textStyleBlack');
     document.querySelectorAll('#textStyle option')[1].textContent = t('textStyleGrey');
     document.querySelectorAll('#textStyle option')[2].textContent = t('textStyleLight');
-    document.querySelector('label[for="verticalOffset"]').textContent = t('verticalOffset');
+
 
     // Buttons
     document.getElementById('generateBtn').textContent = t('generatePDF');
+    document.getElementById('clearTitleBtn').textContent = t('clearButton');
+    document.getElementById('clearTextBtn').textContent = t('clearButton');
 
     // Preview
     document.querySelector('.preview-section h2').textContent = t('preview');

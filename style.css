@@ -33,6 +33,10 @@ body {
     line-height: 1.6;
 }
 
+input, select, textarea, button {
+    font-family: 'OpenHuninn', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
 .container {
     max-width: 1400px;
     margin: 0 auto;

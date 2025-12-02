@@ -7,6 +7,7 @@
     <title>POJ Handwriting Practice Generator</title>
     <link rel="stylesheet" href="style.css">
     <script src="translations.js"></script>
+    <script src="presets.js"></script>
     <script src="fonts-iansui.js"></script>
     <script src="fonts-openhuninn.js"></script>
     <script src="fonts-chiayicity.js"></script>
@@ -28,7 +29,7 @@
                 <div class="language-switcher">
                     <select id="languageSelect">
                         <option value="en">English</option>
-                        <option value="poj">Pe̍h-ōe-jī</option>
+                        <option value="poj" selected>Pe̍h-ōe-jī</option>
                     </select>
                 </div>
             </div>
@@ -41,10 +42,19 @@
                         <h3>Text Settings</h3>
                         <div class="text-settings-grid">
                             <div class="form-group">
+                                <label for="presetSelect">Preset:</label>
+                                <select id="presetSelect">
+                                    <option value="empty">Empty</option>
+                                    <option value="default" selected>Default</option>
+                                    <option value="vowels">Vowels (A, I, U, O͘, E, O)</option>
+                                    <option value="consonants">Consonants (p, b, m, t, n, l...)</option>
+                                    <option value="tones">Tone Marks</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
                                 <label for="pageTitle">Page Title:</label>
                                 <div class="input-with-clear">
-                                    <input type="text" id="pageTitle" placeholder="e.g., Handwriting Practice"
-                                        value="Liān-si̍p Siá Pe̍h-ōe-jī">
+                                    <input type="text" id="pageTitle" placeholder="e.g., Handwriting Practice">
                                     <button id="clearTitleBtn" class="clear-btn">Clear</button>
                                 </div>
                             </div>
@@ -52,7 +62,7 @@
                                 <label for="inputText">Text to Practice:</label>
                                 <div class="input-with-clear">
                                     <textarea id="inputText" rows="2"
-                                        placeholder="Enter text to practice...">Kin-á-ji̍t thiⁿ-khì chin hó.</textarea>
+                                        placeholder="Enter text to practice..."></textarea>
                                     <button id="clearTextBtn" class="clear-btn">Clear</button>
                                 </div>
                             </div>
@@ -82,10 +92,10 @@
                         <div class="form-group">
                             <label for="fontSelect">Font:</label>
                             <select id="fontSelect">
-                                <option value="Iansui-Regular.ttf" selected>Iansui</option>
+                                <option value="LessonOne-Regular.ttf" selected>Lesson One</option>
                                 <option value="jf-openhuninn.ttf">Open Huninn</option>
+                                <option value="Iansui-Regular.ttf">Iansui</option>
                                 <option value="ChiayiCity.ttf">Chiayi City</option>
-                                <option value="LessonOne-Regular.ttf">Lesson One</option>
                             </select>
                         </div>
                         <div class="form-group">
@@ -122,10 +132,7 @@
                             <label for="lineHeight">Line Height (mm):</label>
                             <input type="number" id="lineHeight" value="20" min="10" max="50">
                         </div>
-                        <div class="form-group">
-                            <label for="verticalOffset">Vertical Offset (mm):</label>
-                            <input type="number" id="verticalOffset" value="0" min="-10" max="10" step="0.1">
-                        </div>
+
                     </div>
 
                     <button id="generateBtn" class="primary-btn">Generate PDF</button>
