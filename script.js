@@ -94,105 +94,140 @@ class LayoutEngine {
             followingLines // 'fill' or 'blank'
         } = settings;
 
-        // 1. Setup Dimensions (in Points)
+        // 1. Setup Dimensions (ALL IN MM)
         const paperDimsMm = this.getPaperDimensionsMm(paperSize, orientation);
-        const widthPt = paperDimsMm.width * MM_TO_PT;
-        const heightPt = paperDimsMm.height * MM_TO_PT;
-        const marginMm = 15;
-        const marginPt = marginMm * MM_TO_PT;
-        const bottomMarginMm = 10; // Allow drawing closer to bottom
-        const bottomMarginPt = bottomMarginMm * MM_TO_PT;
-        const contentWidthPt = widthPt - (marginPt * 2);
+        const widthMm = paperDimsMm.width;
+        const heightMm = paperDimsMm.height;
+        const marginMm = 12;
 
-        // Grid Settings
-        const gridHeightPt = lineHeightMm * MM_TO_PT;
-        const gapPt = DEFAULT_GAP_MM * MM_TO_PT;
-        const rowHeightPt = gridHeightPt + gapPt;
+        // Footer Settings (in MM)
+        const footerFontSizeMm = 16 * PT_TO_MM;
+        const footerYMm = heightMm - marginMm - footerFontSizeMm;
+        const footerTopMarginMm = 5;
+        const maxContentYMm = footerYMm - footerTopMarginMm;
+        const contentWidthMm = widthMm - (marginMm * 2);
 
-        // Font Settings
+        // Grid Settings (in MM)
+        const gridHeightMm = lineHeightMm;
+        const gapMm = DEFAULT_GAP_MM;
+        const rowHeightMm = gridHeightMm + gapMm;
+
+        // Font Settings (in MM)
         // With 4-line system, text should fit between line 1 (0) and line 3 (0.5)
         // That's 50% of the grid height
-        const fontSizePt = gridHeightPt * 0.5;
+        const fontSizeMm = gridHeightMm * 0.5;
+
+        // For text measurement, we need to use pt/px, so convert temporarily
+        const fontSizePt = fontSizeMm * MM_TO_PT;
         this.ctx.font = `${fontSizePt}px "${fontFamily}"`;
 
-        // Text padding (left and right)
-        const TEXT_PADDING_MM = 2;
-        const textPaddingPt = TEXT_PADDING_MM * MM_TO_PT;
+        // Text padding (left and right) in MM
+        const textPaddingMm = 2;
 
         const pages = [];
         let currentPage = { items: [], pageNumber: 1 };
 
-        // Helper to add title and get start Y
+        // Helper to add title and get start Y (in MM)
         const addTitleAndGetY = (page) => {
             if (pageTitle && pageTitle.trim()) {
-                const titleFontSizePt = 32;
+                let titleFontSizeMm = 32 * PT_TO_MM;
+                let titleFontSizePt = titleFontSizeMm * MM_TO_PT;
                 this.ctx.font = `bold ${titleFontSizePt}px "${fontFamily}"`;
-                const titleWidth = this.ctx.measureText(pageTitle).width;
+                let titleWidthPx = this.ctx.measureText(pageTitle).width;
+                // Convert px to mm: px is roughly pt at scale 1, so px * PT_TO_MM
+                let titleWidthMm = titleWidthPx * PT_TO_MM;
 
-                // Move title higher into the margin (Decreased top space)
-                const titleY = marginPt - 20
+                // Auto-shrink if title exceeds available width
+                const availableWidthMm = contentWidthMm;
+                if (titleWidthMm > availableWidthMm) {
+                    // Calculate scale factor needed
+                    const scaleFactor = availableWidthMm / titleWidthMm;
+                    titleFontSizeMm = titleFontSizeMm * scaleFactor;
+                    titleFontSizePt = titleFontSizeMm * MM_TO_PT;
+
+                    // Re-measure with new font size
+                    this.ctx.font = `bold ${titleFontSizePt}px "${fontFamily}"`;
+                    titleWidthPx = this.ctx.measureText(pageTitle).width;
+                    titleWidthMm = titleWidthPx * PT_TO_MM;
+                }
+
+                const titleYMm = marginMm;
                 page.items.push({
                     type: 'title',
                     text: pageTitle,
-                    x: widthPt / 2,
-                    y: titleY,
-                    width: titleWidth,
-                    fontSize: titleFontSizePt,
+                    xMm: widthMm / 2, // Center X position
+                    yMm: titleYMm,
+                    widthMm: titleWidthMm,
+                    fontSizeMm: titleFontSizeMm,
                     font: fontFamily
                 });
 
                 // Reset font for body
                 this.ctx.font = `${fontSizePt}px "${fontFamily}"`;
 
-                // Decreased bottom space (gap between title and text)
-                return titleY + titleFontSizePt + 30;
+                // Gap between title and text
+                const titleBottomMarginMm = 10;
+                return titleYMm + titleFontSizeMm + titleBottomMarginMm;
             }
-            return marginPt;
+            return marginMm;
         };
 
-        let currentY = addTitleAndGetY(currentPage);
+        let currentYMm = addTitleAndGetY(currentPage);
 
         // Helper to add new page
         const startNewPage = () => {
             pages.push(currentPage);
             currentPage = { items: [], pageNumber: pages.length + 1 };
-            currentY = addTitleAndGetY(currentPage);
+            currentYMm = addTitleAndGetY(currentPage);
         };
 
         // 3. Process Text
         const paragraphs = this.normalizeText(text).split('\n');
 
         paragraphs.forEach(paragraph => {
-            if (!paragraph.trim()) return; // Skip empty paragraphs (or handle as empty line?)
+            if (!paragraph.trim()) {
+                // Handle empty line
+                if (currentYMm + gridHeightMm > maxContentYMm) {
+                    startNewPage();
+                }
+                this.addLineToPage(currentPage, '', currentYMm, marginMm, contentWidthMm, gridHeightMm, fontSizeMm, fontFamily, settings, textPaddingMm);
+                currentYMm += rowHeightMm;
+                return;
+            }
 
             const words = paragraph.split(' ');
             let currentLineWords = [];
 
-            // Available width for text (accounting for padding on both sides)
-            const availableTextWidth = contentWidthPt - (textPaddingPt * 2);
+            // Available width for text (accounting for padding on both sides) in MM
+            const availableTextWidthMm = contentWidthMm - (textPaddingMm * 2);
+            // Convert mm to px for canvas measurement: mm -> pt -> px (at font size scale)
+            const availableTextWidthPx = availableTextWidthMm * MM_TO_PT;
 
             words.forEach(word => {
                 const testLine = currentLineWords.length > 0 ? currentLineWords.join(' ') + ' ' + word : word;
                 const metrics = this.ctx.measureText(testLine);
 
-                if (metrics.width > availableTextWidth && currentLineWords.length > 0) {
+                if (metrics.width > availableTextWidthPx && currentLineWords.length > 0) {
                     // Line full, push currentLine
 
-                    // Check pagination BEFORE adding
-                    if (currentY + gridHeightPt > heightPt - bottomMarginPt) {
+                    // Check pagination
+                    if (currentYMm + gridHeightMm > maxContentYMm) {
                         startNewPage();
                     }
 
-                    this.addLineToPage(currentPage, currentLineWords.join(' '), currentY, marginPt, contentWidthPt, gridHeightPt, fontSizePt, fontFamily, settings, textPaddingPt);
-                    currentY += rowHeightPt;
+                    this.addLineToPage(currentPage, currentLineWords.join(' '), currentYMm, marginMm, contentWidthMm, gridHeightMm, fontSizeMm, fontFamily, settings, textPaddingMm);
+                    currentYMm += rowHeightMm;
 
                     // If Copying mode, add empty line
                     if (practiceMode === 'copying') {
-                        if (currentY + gridHeightPt > heightPt - bottomMarginPt) {
+                        if (currentYMm + gridHeightMm > maxContentYMm) {
                             startNewPage();
                         }
-                        this.addLineToPage(currentPage, '', currentY, marginPt, contentWidthPt, gridHeightPt, fontSizePt, fontFamily, settings, textPaddingPt);
-                        currentY += rowHeightPt;
+                        this.addLineToPage(currentPage, '', currentYMm, marginMm, contentWidthMm, gridHeightMm, fontSizeMm, fontFamily, settings, textPaddingMm);
+                        currentYMm += rowHeightMm;
+                        if (currentYMm + gridHeightMm > maxContentYMm) {
+                            startNewPage();
+                        }
                     }
 
                     currentLineWords = [word];
@@ -203,30 +238,28 @@ class LayoutEngine {
 
             // Push remaining words
             if (currentLineWords.length > 0) {
-                if (currentY + gridHeightPt > heightPt - bottomMarginPt) {
+                if (currentYMm + gridHeightMm > maxContentYMm) {
                     startNewPage();
                 }
-                this.addLineToPage(currentPage, currentLineWords.join(' '), currentY, marginPt, contentWidthPt, gridHeightPt, fontSizePt, fontFamily, settings, textPaddingPt);
-                currentY += rowHeightPt;
+                this.addLineToPage(currentPage, currentLineWords.join(' '), currentYMm, marginMm, contentWidthMm, gridHeightMm, fontSizeMm, fontFamily, settings, textPaddingMm);
+                currentYMm += rowHeightMm;
 
                 if (practiceMode === 'copying') {
-                    if (currentY + gridHeightPt > heightPt - bottomMarginPt) {
+                    if (currentYMm + gridHeightMm > maxContentYMm) {
                         startNewPage();
                     }
-                    this.addLineToPage(currentPage, '', currentY, marginPt, contentWidthPt, gridHeightPt, fontSizePt, fontFamily, settings, textPaddingPt);
-                    currentY += rowHeightPt;
+                    this.addLineToPage(currentPage, '', currentYMm, marginMm, contentWidthMm, gridHeightMm, fontSizeMm, fontFamily, settings, textPaddingMm);
+                    currentYMm += rowHeightMm;
                 }
             }
         });
 
         // 4. Fill remaining lines on current page only
-        // If there's no content at all, add at least one line to show something
         if (currentPage.items.length === 0 || (followingLines === 'fill' && currentPage.items.length > 0)) {
-            // Safety break
             let safety = 0;
-            while (currentY + gridHeightPt <= heightPt - bottomMarginPt && safety < 100) {
-                this.addLineToPage(currentPage, '', currentY, marginPt, contentWidthPt, gridHeightPt, fontSizePt, fontFamily, settings, textPaddingPt);
-                currentY += rowHeightPt;
+            while (currentYMm + gridHeightMm <= maxContentYMm && safety < 100) {
+                this.addLineToPage(currentPage, '', currentYMm, marginMm, contentWidthMm, gridHeightMm, fontSizeMm, fontFamily, settings, textPaddingMm);
+                currentYMm += rowHeightMm;
                 safety++;
             }
         }
@@ -236,27 +269,39 @@ class LayoutEngine {
             pages.push(currentPage);
         }
 
+        // 5. Add Footer to all pages (in MM)
+        pages.forEach(page => {
+            page.items.push({
+                type: 'footer',
+                text: 'kesi.poj.tw © Tâi-bûn Ke-si Mī',
+                xMm: widthMm / 2,
+                yMm: footerYMm,
+                fontSizeMm: footerFontSizeMm,
+                font: 'Iansui'
+            });
+        });
+
         return {
             pages,
-            widthPt,
-            heightPt
+            widthMm,
+            heightMm
         };
     }
 
-    addLineToPage(page, text, y, x, width, height, fontSize, font, settings, textPaddingPt = 0) {
+    addLineToPage(page, text, yMm, xMm, widthMm, heightMm, fontSizeMm, font, settings, textPaddingMm = 0) {
         // 4-Line Guide System Layout:
         // Line 1 (top):    y + 0
         // Line 2:          y + height * 0.25
         // Line 3:          y + height * 0.5
         // Line 4:          y + height * 0.75
 
-        // Add Guide Lines
+        // Add Guide Lines (all in MM)
         page.items.push({
             type: 'guide',
-            x: x,
-            y: y,
-            width: width,
-            height: height,
+            xMm: xMm,
+            yMm: yMm,
+            widthMm: widthMm,
+            heightMm: heightMm,
             style: settings.guideStyle
         });
 
@@ -267,24 +312,18 @@ class LayoutEngine {
             // - Baseline should be at Line 3 (0.5)
             // - Font size is 50% of grid height (distance from Line 1 to Line 3)
 
-            // Calculate baseline Y position (at Line 3)
-            const baselineY = y + (height * 0.5);
-
-            // Measure text metrics for PDF rendering
-            this.ctx.font = `${fontSize}px "${font}"`;
-            const metrics = this.ctx.measureText(text);
-            const ascent = metrics.actualBoundingBoxAscent || (fontSize * 0.85);
+            // Calculate baseline Y position (at Line 3) in MM
+            const baselineYMm = yMm + (heightMm * 0.5);
 
             page.items.push({
                 type: 'text',
                 text: text,
-                x: x + textPaddingPt,
-                y: baselineY,
-                fontSize: fontSize,
+                xMm: xMm + textPaddingMm,
+                yMm: baselineYMm,
+                fontSizeMm: fontSizeMm,
                 font: font,
                 color: settings.textStyle,
-                align: 'left',
-                ascent: ascent
+                align: 'left'
             });
         }
     }
@@ -314,14 +353,14 @@ function renderPreview(layout, canvasId) {
 
     // Scale for high DPI
     const scale = 2;
+    const MM_TO_PX = MM_TO_PT * scale; // mm -> pt -> px
 
     // Calculate total canvas height
-    // Add some padding between pages
     const pageGap = 20 * scale;
-    const totalHeightPt = layout.pages.reduce((acc, _) => acc + layout.heightPt, 0);
-    const totalHeightPx = totalHeightPt * scale + (layout.pages.length - 1) * pageGap;
+    const pageHeightPx = layout.heightMm * MM_TO_PX;
+    const totalHeightPx = pageHeightPx * layout.pages.length + (layout.pages.length - 1) * pageGap;
 
-    canvas.width = layout.widthPt * scale;
+    canvas.width = layout.widthMm * MM_TO_PX;
     canvas.height = totalHeightPx;
     canvas.style.width = '100%';
     canvas.style.height = 'auto';
@@ -335,35 +374,34 @@ function renderPreview(layout, canvasId) {
     layout.pages.forEach(page => {
         // Draw Page Background
         ctx.fillStyle = 'white';
-        ctx.fillRect(0, pageY, layout.widthPt * scale, layout.heightPt * scale);
+        ctx.fillRect(0, pageY, layout.widthMm * MM_TO_PX, pageHeightPx);
         ctx.strokeStyle = '#ccc';
-        ctx.strokeRect(0, pageY, layout.widthPt * scale, layout.heightPt * scale);
+        ctx.strokeRect(0, pageY, layout.widthMm * MM_TO_PX, pageHeightPx);
 
         // Draw Items
         page.items.forEach(item => {
             if (item.type === 'guide') {
-                drawGuideOnCanvas(ctx, item, scale, pageY);
+                drawGuideOnCanvas(ctx, item, MM_TO_PX, pageY);
             } else if (item.type === 'text') {
-                drawTextOnCanvas(ctx, item, scale, pageY);
+                drawTextOnCanvas(ctx, item, MM_TO_PX, pageY);
             } else if (item.type === 'title') {
-                drawTitleOnCanvas(ctx, item, scale, pageY);
+                drawTitleOnCanvas(ctx, item, MM_TO_PX, pageY);
+            } else if (item.type === 'footer') {
+                drawFooterOnCanvas(ctx, item, MM_TO_PX, pageY);
             }
         });
 
-        // Draw Footer
-        drawFooterOnCanvas(ctx, layout.widthPt, layout.heightPt, scale, pageY);
-
-        pageY += (layout.heightPt * scale) + pageGap;
+        pageY += pageHeightPx + pageGap;
     });
 }
 
-function drawGuideOnCanvas(ctx, item, scale, pageOffsetY) {
+function drawGuideOnCanvas(ctx, item, mmToPx, pageOffsetY) {
     if (item.style === 'none') return;
 
-    const x = item.x * scale;
-    const y = item.y * scale + pageOffsetY;
-    const w = item.width * scale;
-    const h = item.height * scale;
+    const x = item.xMm * mmToPx;
+    const y = item.yMm * mmToPx + pageOffsetY;
+    const w = item.widthMm * mmToPx;
+    const h = item.heightMm * mmToPx;
 
     const color = item.style === 'light' ? '#dcdcdc' : '#999';
 
@@ -411,25 +449,25 @@ function drawGuideOnCanvas(ctx, item, scale, pageOffsetY) {
     ctx.stroke();
 }
 
-function drawTextOnCanvas(ctx, item, scale, pageOffsetY) {
-    const x = item.x * scale;
-    const y = item.y * scale + pageOffsetY; // This is baseline y
+function drawTextOnCanvas(ctx, item, mmToPx, pageOffsetY) {
+    const x = item.xMm * mmToPx;
+    const y = item.yMm * mmToPx + pageOffsetY; // This is baseline y
 
     let color = 'black';
     if (item.color === 'grey') color = '#999';
     else if (item.color === 'light') color = '#dcdcdc';
 
-    ctx.font = `${item.fontSize * scale}px "${item.font}"`;
+    ctx.font = `${item.fontSizeMm * mmToPx}px "${item.font}"`;
     ctx.fillStyle = color;
-    ctx.textBaseline = 'alphabetic'; // Important: matches PDF baseline logic
+    ctx.textBaseline = 'alphabetic'; // Important: baseline at y position
     ctx.fillText(item.text, x, y);
 }
 
-function drawTitleOnCanvas(ctx, item, scale, pageOffsetY) {
-    const x = item.x * scale;
-    const y = item.y * scale + pageOffsetY;
+function drawTitleOnCanvas(ctx, item, mmToPx, pageOffsetY) {
+    const x = item.xMm * mmToPx;
+    const y = item.yMm * mmToPx + pageOffsetY;
 
-    ctx.font = `bold ${item.fontSize * scale}px "${item.font}"`;
+    ctx.font = `bold ${item.fontSizeMm * mmToPx}px "${item.font}"`;
     ctx.fillStyle = 'black';
     ctx.textAlign = 'center';
     ctx.textBaseline = 'top';
@@ -437,20 +475,24 @@ function drawTitleOnCanvas(ctx, item, scale, pageOffsetY) {
     ctx.textAlign = 'left'; // Reset
 }
 
-function drawFooterOnCanvas(ctx, pageWidthPt, pageHeightPt, scale, pageOffsetY) {
-    const x = (pageWidthPt / 2) * scale;
-    const y = (pageHeightPt - 10) * scale + pageOffsetY; // Closer to bottom
+function drawFooterOnCanvas(ctx, item, mmToPx, pageOffsetY) {
+    const x = item.xMm * mmToPx;
+    const y = item.yMm * mmToPx + pageOffsetY;
 
-    ctx.font = `${16 * scale}px "Iansui"`;
+    ctx.font = `${item.fontSizeMm * mmToPx}px "${item.font}"`;
     ctx.fillStyle = '#999';
     ctx.textAlign = 'center';
-    ctx.textBaseline = 'bottom';
-    ctx.fillText('kesi.poj.tw © Tâi-bûn Ke-si Mī', x, y);
+    ctx.textBaseline = 'top';
+    ctx.fillText(item.text, x, y);
     ctx.textAlign = 'left'; // Reset
 }
 
 function generatePDF(layout) {
     const docContent = [];
+
+    // Convert layout dimensions from mm to pt
+    const widthPt = layout.widthMm * MM_TO_PT;
+    const heightPt = layout.heightMm * MM_TO_PT;
 
     layout.pages.forEach((page, index) => {
         // Page Break for subsequent pages
@@ -463,73 +505,94 @@ function generatePDF(layout) {
                 if (item.style === 'none') return;
                 const color = item.style === 'light' ? '#dcdcdc' : '#999';
 
+                // Convert mm to pt
+                const xPt = item.xMm * MM_TO_PT;
+                const yPt = item.yMm * MM_TO_PT;
+                const widthPt = item.widthMm * MM_TO_PT;
+                const heightPt = item.heightMm * MM_TO_PT;
+
                 // Draw 4 horizontal lines + 2 vertical lines
                 docContent.push({
                     canvas: [
-                        { type: 'line', x1: 0, y1: 0, x2: item.width, y2: 0, lineWidth: 0.5, lineColor: color }, // Top (solid)
-                        { type: 'line', x1: 0, y1: item.height * 0.25, x2: item.width, y2: item.height * 0.25, lineWidth: 0.5, lineColor: color, dash: { length: 2 } }, // 0.25 (dashed)
-                        { type: 'line', x1: 0, y1: item.height * 0.5, x2: item.width, y2: item.height * 0.5, lineWidth: 0.5, lineColor: color }, // 0.5 (solid)
-                        { type: 'line', x1: 0, y1: item.height * 0.75, x2: item.width, y2: item.height * 0.75, lineWidth: 0.5, lineColor: color, dash: { length: 2 } }, // 0.75 (dashed)
-                        { type: 'line', x1: 0, y1: 0, x2: 0, y2: item.height * 0.75, lineWidth: 0.5, lineColor: color }, // Left vertical
-                        { type: 'line', x1: item.width, y1: 0, x2: item.width, y2: item.height * 0.75, lineWidth: 0.5, lineColor: color } // Right vertical
+                        { type: 'line', x1: 0, y1: 0, x2: widthPt, y2: 0, lineWidth: 0.5, lineColor: color }, // Top (solid)
+                        { type: 'line', x1: 0, y1: heightPt * 0.25, x2: widthPt, y2: heightPt * 0.25, lineWidth: 0.5, lineColor: color, dash: { length: 2 } }, // 0.25 (dashed)
+                        { type: 'line', x1: 0, y1: heightPt * 0.5, x2: widthPt, y2: heightPt * 0.5, lineWidth: 0.5, lineColor: color }, // 0.5 (solid)
+                        { type: 'line', x1: 0, y1: heightPt * 0.75, x2: widthPt, y2: heightPt * 0.75, lineWidth: 0.5, lineColor: color, dash: { length: 2 } }, // 0.75 (dashed)
+                        { type: 'line', x1: 0, y1: 0, x2: 0, y2: heightPt * 0.75, lineWidth: 0.5, lineColor: color }, // Left vertical
+                        { type: 'line', x1: widthPt, y1: 0, x2: widthPt, y2: heightPt * 0.75, lineWidth: 0.5, lineColor: color } // Right vertical
                     ],
-                    absolutePosition: { x: item.x, y: item.y }
+                    absolutePosition: { x: xPt, y: yPt }
                 });
             } else if (item.type === 'text') {
                 let color = 'black';
                 if (item.color === 'grey') color = '#999';
                 else if (item.color === 'light') color = '#dcdcdc';
 
+                // Convert mm to pt
+                const xPt = item.xMm * MM_TO_PT;
+                const baselineYPt = item.yMm * MM_TO_PT;
+                const fontSizePt = item.fontSizeMm * MM_TO_PT;
+
                 // pdfmake positions text from top-left, but we have baseline Y
                 // Each font renders differently in pdfmake vs canvas, so we need font-specific corrections
                 const fontCorrectionFactors = {
-                    'LessonOne': 1.38,
-                    'OpenHuninn': 1.18,
-                    'Iansui': 1.20,
-                    'ChiayiCity': 1.22,
+                    'LessonOne': 1.27,
+                    'OpenHuninn': 1.00,
+                    'Iansui': 1.12,
+                    'ChiayiCity': 1.36,
                 };
 
                 const correctionFactor = fontCorrectionFactors[item.font] || 0.95;
-                const correctedAscent = item.ascent * correctionFactor;
-                const topY = item.y - correctedAscent;
+                // Estimate ascent based on font size
+                const estimatedAscent = fontSizePt * 0.85;
+                const correctedAscent = estimatedAscent * correctionFactor;
+                const topY = baselineYPt - correctedAscent;
 
                 docContent.push({
                     text: item.text,
                     font: item.font,
-                    fontSize: item.fontSize,
+                    fontSize: fontSizePt,
                     color: color,
-                    absolutePosition: { x: item.x, y: topY }
+                    absolutePosition: { x: xPt, y: topY }
                 });
             } else if (item.type === 'title') {
-                // Manual centering for absolute positioning
-                const leftX = item.x - (item.width / 2);
+                // Convert mm to pt
+                const yPt = item.yMm * MM_TO_PT;
+                const fontSizePt = item.fontSizeMm * MM_TO_PT;
 
                 docContent.push({
                     text: item.text,
                     font: item.font,
-                    fontSize: item.fontSize,
+                    fontSize: fontSizePt,
                     bold: true,
-                    absolutePosition: { x: leftX, y: item.y }
+                    alignment: 'center',
+                    absolutePosition: { x: 0, y: yPt },
+                    width: widthPt // Full page width for centering
+                });
+            } else if (item.type === 'footer') {
+                // Convert mm to pt
+                const yPt = item.yMm * MM_TO_PT;
+                const fontSizePt = item.fontSizeMm * MM_TO_PT;
+
+                docContent.push({
+                    text: item.text,
+                    font: item.font,
+                    fontSize: fontSizePt,
+                    color: '#999',
+                    alignment: 'center',
+                    absolutePosition: { x: 0, y: yPt },
+                    width: widthPt // Ensure centering works
                 });
             }
         });
     });
 
     const docDefinition = {
-        pageSize: { width: layout.widthPt, height: layout.heightPt },
-        pageMargins: [0, 0, 0, 20], // Bottom margin for footer
+        pageSize: { width: widthPt, height: heightPt },
+        pageMargins: [0, 0, 0, 0], // We handle margins
         content: docContent,
         defaultStyle: {
             font: 'Iansui' // Default
-        },
-        footer: function (currentPage, pageCount) {
-            return {
-                text: 'kesi.poj.tw © Tâi-bûn Ke-si Mī',
-                alignment: 'center',
-                fontSize: 16,
-                color: '#999',
-                margin: [0, 0, 0, 0] // Top margin 0 to align with preview (approx 20pt from bottom)
-            };
         }
     };
 

@@ -33,7 +33,10 @@ body {
     line-height: 1.6;
 }
 
-input, select, textarea, button {
+input,
+select,
+textarea,
+button {
     font-family: 'OpenHuninn', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
@@ -113,7 +116,7 @@ header {
 }
 
 .language-switcher select {
-    padding: 0.5rem;
+    padding: 0.8rem;
     border-radius: 20px;
     border: 1px solid var(--primary-color);
     background-color: white;
@@ -121,6 +124,8 @@ header {
     font-weight: 600;
     cursor: pointer;
     min-width: 120px;
+    line-height: 2;
+    min-height: 3.5rem;
 }
 
 h1 {
@@ -202,14 +207,14 @@ label {
 
 textarea {
     width: 100%;
-    padding: 0.6rem;
-    /* Reduced padding */
+    padding: 0.5rem;
     border: 1px solid var(--border-color);
     border-radius: 4px;
     font-family: 'OpenHuninn', 'Noto Serif', serif;
     font-size: 1rem;
     resize: vertical;
     min-height: 150px;
+    line-height: 1.5;
 }
 
 .settings-section {
@@ -241,12 +246,12 @@ textarea {
 select,
 input {
     width: 100%;
-    padding: 0.6rem;
-    /* Reduced padding */
+    padding: 0.8rem;
     border: 1px solid var(--border-color);
     border-radius: 4px;
-    font-size: 0.95rem;
-    /* Slightly smaller font */
+    font-size: 1rem;
+    line-height: 1.5;
+    min-height: 3rem;
 }
 
 .primary-btn {

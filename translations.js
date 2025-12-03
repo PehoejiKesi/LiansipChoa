@@ -118,7 +118,7 @@ const translations = {
 
         // Buttons
         generatePDF: "Chò PDF Tòng-àn",
-        clearButton: "Têng-lâi",
+        clearButton: "Thâi",
 
         // Preview
         preview: "Ē Seⁿ Chò Án-ne"
