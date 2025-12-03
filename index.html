@@ -6,6 +6,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>POJ Handwriting Practice Generator</title>
     <link rel="stylesheet" href="style.css">
+
+    <!-- JavaScript Dependencies -->
     <script src="translations.js"></script>
     <script src="presets.js"></script>
     <script src="fonts-iansui.js"></script>
@@ -14,12 +16,25 @@
     <script src="fonts-lessonone.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script>
+
+    <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Noto+Serif:ital,wght@0,400;0,700;1,400;1,700&display=swap"
         rel="stylesheet">
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="/favicon-96x96.png" sizes="96x96" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="shortcut icon" href="/favicon.ico" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+    <meta name="apple-mobile-web-app-title" content="Siá POJ" />
+    <link rel="manifest" href="/site.webmanifest" />
 </head>
 
 <body>
     <div class="container">
+        <!-- ============================================================
+             HEADER
+             ============================================================ -->
         <header>
             <div class="header-content">
                 <div class="header-text">
@@ -35,9 +50,14 @@
             </div>
         </header>
 
+        <!-- ============================================================
+             MAIN CONTENT
+             ============================================================ -->
         <main class="layout-container">
+            <!-- Left Column: Settings Controls -->
             <div class="controls-column">
                 <div class="controls">
+                    <!-- Text Settings Section -->
                     <div class="settings-section">
                         <h3>Text Settings</h3>
                         <div class="text-settings-grid">
@@ -69,6 +89,7 @@
                         </div>
                     </div>
 
+                    <!-- Page Settings Section -->
                     <div class="settings-section">
                         <h3>Page Settings</h3>
                         <div class="form-group">
@@ -87,6 +108,7 @@
                         </div>
                     </div>
 
+                    <!-- Handwriting Settings Section -->
                     <div class="settings-section">
                         <h3>Handwriting Settings</h3>
                         <div class="form-group">
@@ -132,13 +154,14 @@
                             <label for="lineHeight">Line Height (mm):</label>
                             <input type="number" id="lineHeight" value="26" min="10" max="50">
                         </div>
-
                     </div>
 
+                    <!-- Generate Button -->
                     <button id="generateBtn" class="primary-btn">Generate PDF</button>
                 </div>
             </div>
 
+            <!-- Right Column: Preview -->
             <div class="preview-column">
                 <div class="preview-section">
                     <h2>Preview</h2>
@@ -149,10 +172,15 @@
             </div>
         </main>
 
+        <!-- ============================================================
+             FOOTER
+             ============================================================ -->
         <footer>
             <a href="https://linktr.ee/taibunkesimi" target="_blank" class="footer-btn">Tâi-bûn Ke-si Mī</a>
         </footer>
     </div>
+
+    <!-- Main Application Script -->
     <script src="script.js?v=1.1"></script>
 </body>
 

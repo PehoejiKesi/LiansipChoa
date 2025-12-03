@@ -1,12 +1,26 @@
 // POJ Handwriting Practice Generator - v3.0 (Unified Layout Engine)
 
-// --- Constants & Config ---
-const MM_TO_PT = 2.83465;
-const PT_TO_MM = 1 / MM_TO_PT;
-const DEFAULT_GAP_MM = 0.5; // Gap between lines
+// ============================================================================
+// CONSTANTS & CONFIGURATION
+// ============================================================================
 
-// --- Font Management ---
-// Register custom fonts with pdfmake
+/** Conversion factor from millimeters to points */
+const MM_TO_PT = 2.83465;
+
+/** Conversion factor from points to millimeters */
+const PT_TO_MM = 1 / MM_TO_PT;
+
+/** Default gap between practice lines in millimeters */
+const DEFAULT_GAP_MM = 0.5;
+
+// ============================================================================
+// FONT MANAGEMENT
+// ============================================================================
+
+/**
+ * Registers custom fonts with pdfMake library
+ * Loads font data from global base64 variables and configures font families
+ */
 function registerFonts() {
     pdfMake.vfs = {
         "Iansui-Regular.ttf": typeof IANSUI_FONT_BASE64 !== 'undefined' ? IANSUI_FONT_BASE64 : "",
@@ -43,8 +57,14 @@ function registerFonts() {
     };
 }
 
+/** Cache for loaded preview fonts */
 const fontCache = {};
 
+/**
+ * Loads custom fonts for canvas preview rendering
+ * Converts base64 font data to FontFace objects and adds them to the document
+ * @returns {Promise<void>}
+ */
 async function loadPreviewFonts() {
     const fonts = [
         { name: 'Iansui', data: typeof IANSUI_FONT_BASE64 !== 'undefined' ? IANSUI_FONT_BASE64 : null },
@@ -75,13 +95,52 @@ async function loadPreviewFonts() {
     await Promise.all(promises);
 }
 
-// --- Layout Engine ---
+/**
+ * Maps font filename to font family name
+ * @param {string} filename - Font filename (e.g., "Iansui-Regular.ttf")
+ * @returns {string} Font family name (e.g., "Iansui")
+ */
+function getFontFamilyName(filename) {
+    const fontMap = {
+        'Iansui-Regular.ttf': 'Iansui',
+        'jf-openhuninn.ttf': 'OpenHuninn',
+        'ChiayiCity.ttf': 'ChiayiCity',
+        'LessonOne-Regular.ttf': 'LessonOne'
+    };
+    return fontMap[filename] || 'Iansui';
+}
 
+// ============================================================================
+// LAYOUT ENGINE
+// ============================================================================
+
+/**
+ * Layout engine for generating practice worksheet layouts
+ * Handles text measurement, pagination, and layout item generation
+ * All calculations are done in millimeters (mm) for consistency
+ */
 class LayoutEngine {
+    /**
+     * Creates a new LayoutEngine instance
+     * @param {CanvasRenderingContext2D} ctx - Canvas context for text measurement
+     */
     constructor(ctx) {
-        this.ctx = ctx; // Canvas context for measuring text
+        this.ctx = ctx;
     }
 
+    /**
+     * Generates complete layout for practice worksheets
+     * @param {Object} settings - Layout settings
+     * @param {string} settings.text - Text to practice
+     * @param {string} settings.paperSize - Paper size ('a4' or 'a3')
+     * @param {string} settings.orientation - Page orientation ('portrait' or 'landscape')
+     * @param {number} settings.lineHeightMm - Height of each practice line in mm
+     * @param {string} settings.fontFamily - Font family to use
+     * @param {string} settings.pageTitle - Optional page title
+     * @param {string} settings.practiceMode - Practice mode ('tracing' or 'copying')
+     * @param {string} settings.followingLines - How to fill remaining lines ('fill' or 'blank')
+     * @returns {Object} Layout object with pages, dimensions
+     */
     generateLayout(settings) {
         const {
             text,
@@ -90,34 +149,34 @@ class LayoutEngine {
             lineHeightMm,
             fontFamily,
             pageTitle,
-            practiceMode, // 'tracing' or 'copying'
-            followingLines // 'fill' or 'blank'
+            practiceMode,
+            followingLines
         } = settings;
 
-        // 1. Setup Dimensions (ALL IN MM)
+        // Setup page dimensions (all in MM)
         const paperDimsMm = this.getPaperDimensionsMm(paperSize, orientation);
         const widthMm = paperDimsMm.width;
         const heightMm = paperDimsMm.height;
         const marginMm = 12;
 
-        // Footer Settings (in MM)
+        // Footer configuration (in MM)
         const footerFontSizeMm = 16 * PT_TO_MM;
         const footerYMm = heightMm - marginMm - footerFontSizeMm;
         const footerTopMarginMm = 5;
         const maxContentYMm = footerYMm - footerTopMarginMm;
         const contentWidthMm = widthMm - (marginMm * 2);
 
-        // Grid Settings (in MM)
+        // Grid configuration (in MM)
         const gridHeightMm = lineHeightMm;
         const gapMm = DEFAULT_GAP_MM;
         const rowHeightMm = gridHeightMm + gapMm;
 
-        // Font Settings (in MM)
-        // With 4-line system, text should fit between line 1 (0) and line 3 (0.5)
+        // Font configuration (in MM)
+        // With 4-line system, text fits between line 1 (0) and line 3 (0.5)
         // That's 50% of the grid height
         const fontSizeMm = gridHeightMm * 0.5;
 
-        // For text measurement, we need to use pt/px, so convert temporarily
+        // Set font for text measurement (convert to pt/px temporarily)
         const fontSizePt = fontSizeMm * MM_TO_PT;
         this.ctx.font = `${fontSizePt}px "${fontFamily}"`;
 
@@ -126,69 +185,17 @@ class LayoutEngine {
 
         const pages = [];
         let currentPage = { items: [], pageNumber: 1 };
+        let currentYMm = this.addTitleToPage(currentPage, pageTitle, widthMm, contentWidthMm, marginMm, fontFamily, fontSizePt);
 
-        // Helper to add title and get start Y (in MM)
-        const addTitleAndGetY = (page) => {
-            if (pageTitle && pageTitle.trim()) {
-                let titleFontSizeMm = 32 * PT_TO_MM;
-                let titleFontSizePt = titleFontSizeMm * MM_TO_PT;
-                this.ctx.font = `bold ${titleFontSizePt}px "${fontFamily}"`;
-                let titleWidthPx = this.ctx.measureText(pageTitle).width;
-                // Convert px to mm: px is roughly pt at scale 1, so px * PT_TO_MM
-                let titleWidthMm = titleWidthPx * PT_TO_MM;
-
-                // Auto-shrink if title exceeds available width
-                const availableWidthMm = contentWidthMm;
-                if (titleWidthMm > availableWidthMm) {
-                    // Calculate scale factor needed
-                    const scaleFactor = availableWidthMm / titleWidthMm;
-                    titleFontSizeMm = titleFontSizeMm * scaleFactor;
-                    titleFontSizePt = titleFontSizeMm * MM_TO_PT;
-
-                    // Re-measure with new font size
-                    this.ctx.font = `bold ${titleFontSizePt}px "${fontFamily}"`;
-                    titleWidthPx = this.ctx.measureText(pageTitle).width;
-                    titleWidthMm = titleWidthPx * PT_TO_MM;
-                }
-
-                const titleYMm = marginMm;
-                page.items.push({
-                    type: 'title',
-                    text: pageTitle,
-                    xMm: widthMm / 2, // Center X position
-                    yMm: titleYMm,
-                    widthMm: titleWidthMm,
-                    fontSizeMm: titleFontSizeMm,
-                    font: fontFamily
-                });
-
-                // Reset font for body
-                this.ctx.font = `${fontSizePt}px "${fontFamily}"`;
-
-                // Gap between title and text
-                const titleBottomMarginMm = 10;
-                return titleYMm + titleFontSizeMm + titleBottomMarginMm;
-            }
-            return marginMm;
-        };
-
-        let currentYMm = addTitleAndGetY(currentPage);
-
-        // Helper to add new page
-        const startNewPage = () => {
-            pages.push(currentPage);
-            currentPage = { items: [], pageNumber: pages.length + 1 };
-            currentYMm = addTitleAndGetY(currentPage);
-        };
-
-        // 3. Process Text
+        // Process text into lines
         const paragraphs = this.normalizeText(text).split('\n');
 
         paragraphs.forEach(paragraph => {
             if (!paragraph.trim()) {
                 // Handle empty line
                 if (currentYMm + gridHeightMm > maxContentYMm) {
-                    startNewPage();
+                    currentPage = this.startNewPage(pages, currentPage, pageTitle, widthMm, contentWidthMm, marginMm, fontFamily, fontSizePt);
+                    currentYMm = this.addTitleToPage(currentPage, pageTitle, widthMm, contentWidthMm, marginMm, fontFamily, fontSizePt);
                 }
                 this.addLineToPage(currentPage, '', currentYMm, marginMm, contentWidthMm, gridHeightMm, fontSizeMm, fontFamily, settings, textPaddingMm);
                 currentYMm += rowHeightMm;
@@ -198,9 +205,8 @@ class LayoutEngine {
             const words = paragraph.split(' ');
             let currentLineWords = [];
 
-            // Available width for text (accounting for padding on both sides) in MM
+            // Available width for text (accounting for padding) in MM
             const availableTextWidthMm = contentWidthMm - (textPaddingMm * 2);
-            // Convert mm to px for canvas measurement: mm -> pt -> px (at font size scale)
             const availableTextWidthPx = availableTextWidthMm * MM_TO_PT;
 
             words.forEach(word => {
@@ -208,26 +214,23 @@ class LayoutEngine {
                 const metrics = this.ctx.measureText(testLine);
 
                 if (metrics.width > availableTextWidthPx && currentLineWords.length > 0) {
-                    // Line full, push currentLine
-
-                    // Check pagination
+                    // Line is full, render current line
                     if (currentYMm + gridHeightMm > maxContentYMm) {
-                        startNewPage();
+                        currentPage = this.startNewPage(pages, currentPage, pageTitle, widthMm, contentWidthMm, marginMm, fontFamily, fontSizePt);
+                        currentYMm = this.addTitleToPage(currentPage, pageTitle, widthMm, contentWidthMm, marginMm, fontFamily, fontSizePt);
                     }
 
                     this.addLineToPage(currentPage, currentLineWords.join(' '), currentYMm, marginMm, contentWidthMm, gridHeightMm, fontSizeMm, fontFamily, settings, textPaddingMm);
                     currentYMm += rowHeightMm;
 
-                    // If Copying mode, add empty line
+                    // Add blank line for copying mode
                     if (practiceMode === 'copying') {
                         if (currentYMm + gridHeightMm > maxContentYMm) {
-                            startNewPage();
+                            currentPage = this.startNewPage(pages, currentPage, pageTitle, widthMm, contentWidthMm, marginMm, fontFamily, fontSizePt);
+                            currentYMm = this.addTitleToPage(currentPage, pageTitle, widthMm, contentWidthMm, marginMm, fontFamily, fontSizePt);
                         }
                         this.addLineToPage(currentPage, '', currentYMm, marginMm, contentWidthMm, gridHeightMm, fontSizeMm, fontFamily, settings, textPaddingMm);
                         currentYMm += rowHeightMm;
-                        if (currentYMm + gridHeightMm > maxContentYMm) {
-                            startNewPage();
-                        }
                     }
 
                     currentLineWords = [word];
@@ -236,17 +239,19 @@ class LayoutEngine {
                 }
             });
 
-            // Push remaining words
+            // Render remaining words
             if (currentLineWords.length > 0) {
                 if (currentYMm + gridHeightMm > maxContentYMm) {
-                    startNewPage();
+                    currentPage = this.startNewPage(pages, currentPage, pageTitle, widthMm, contentWidthMm, marginMm, fontFamily, fontSizePt);
+                    currentYMm = this.addTitleToPage(currentPage, pageTitle, widthMm, contentWidthMm, marginMm, fontFamily, fontSizePt);
                 }
                 this.addLineToPage(currentPage, currentLineWords.join(' '), currentYMm, marginMm, contentWidthMm, gridHeightMm, fontSizeMm, fontFamily, settings, textPaddingMm);
                 currentYMm += rowHeightMm;
 
                 if (practiceMode === 'copying') {
                     if (currentYMm + gridHeightMm > maxContentYMm) {
-                        startNewPage();
+                        currentPage = this.startNewPage(pages, currentPage, pageTitle, widthMm, contentWidthMm, marginMm, fontFamily, fontSizePt);
+                        currentYMm = this.addTitleToPage(currentPage, pageTitle, widthMm, contentWidthMm, marginMm, fontFamily, fontSizePt);
                     }
                     this.addLineToPage(currentPage, '', currentYMm, marginMm, contentWidthMm, gridHeightMm, fontSizeMm, fontFamily, settings, textPaddingMm);
                     currentYMm += rowHeightMm;
@@ -254,7 +259,7 @@ class LayoutEngine {
             }
         });
 
-        // 4. Fill remaining lines on current page only
+        // Fill remaining lines on current page
         if (currentPage.items.length === 0 || (followingLines === 'fill' && currentPage.items.length > 0)) {
             let safety = 0;
             while (currentYMm + gridHeightMm <= maxContentYMm && safety < 100) {
@@ -264,12 +269,12 @@ class LayoutEngine {
             }
         }
 
-        // Only push the current page if it has content
+        // Add current page if it has content
         if (currentPage.items.length > 0) {
             pages.push(currentPage);
         }
 
-        // 5. Add Footer to all pages (in MM)
+        // Add footer to all pages
         pages.forEach(page => {
             page.items.push({
                 type: 'footer',
@@ -288,6 +293,86 @@ class LayoutEngine {
         };
     }
 
+    /**
+     * Adds title to page and returns the Y position where content should start
+     * @param {Object} page - Page object to add title to
+     * @param {string} pageTitle - Title text
+     * @param {number} widthMm - Page width in mm
+     * @param {number} contentWidthMm - Content width in mm
+     * @param {number} marginMm - Page margin in mm
+     * @param {string} fontFamily - Font family
+     * @param {number} fontSizePt - Body font size in pt (for resetting context)
+     * @returns {number} Y position in mm where content should start
+     */
+    addTitleToPage(page, pageTitle, widthMm, contentWidthMm, marginMm, fontFamily, fontSizePt) {
+        if (pageTitle && pageTitle.trim()) {
+            let titleFontSizeMm = 32 * PT_TO_MM;
+            let titleFontSizePt = titleFontSizeMm * MM_TO_PT;
+            this.ctx.font = `bold ${titleFontSizePt}px "${fontFamily}"`;
+            let titleWidthPx = this.ctx.measureText(pageTitle).width;
+            let titleWidthMm = titleWidthPx * PT_TO_MM;
+
+            // Auto-shrink if title exceeds available width
+            if (titleWidthMm > contentWidthMm) {
+                const scaleFactor = contentWidthMm / titleWidthMm;
+                titleFontSizeMm = titleFontSizeMm * scaleFactor;
+                titleFontSizePt = titleFontSizeMm * MM_TO_PT;
+
+                this.ctx.font = `bold ${titleFontSizePt}px "${fontFamily}"`;
+                titleWidthPx = this.ctx.measureText(pageTitle).width;
+                titleWidthMm = titleWidthPx * PT_TO_MM;
+            }
+
+            const titleYMm = marginMm;
+            page.items.push({
+                type: 'title',
+                text: pageTitle,
+                xMm: widthMm / 2,
+                yMm: titleYMm,
+                widthMm: titleWidthMm,
+                fontSizeMm: titleFontSizeMm,
+                font: fontFamily
+            });
+
+            // Reset font for body text
+            this.ctx.font = `${fontSizePt}px "${fontFamily}"`;
+
+            const titleBottomMarginMm = 10;
+            return titleYMm + titleFontSizeMm + titleBottomMarginMm;
+        }
+        return marginMm;
+    }
+
+    /**
+     * Starts a new page, pushing the current page to the pages array
+     * @param {Array} pages - Array of pages
+     * @param {Object} currentPage - Current page object
+     * @param {string} pageTitle - Page title
+     * @param {number} widthMm - Page width in mm
+     * @param {number} contentWidthMm - Content width in mm
+     * @param {number} marginMm - Page margin in mm
+     * @param {string} fontFamily - Font family
+     * @param {number} fontSizePt - Body font size in pt
+     * @returns {Object} New page object
+     */
+    startNewPage(pages, currentPage, pageTitle, widthMm, contentWidthMm, marginMm, fontFamily, fontSizePt) {
+        pages.push(currentPage);
+        return { items: [], pageNumber: pages.length + 1 };
+    }
+
+    /**
+     * Adds a practice line to the page with guide lines and optional text
+     * @param {Object} page - Page object
+     * @param {string} text - Text to display on the line
+     * @param {number} yMm - Y position in mm
+     * @param {number} xMm - X position in mm
+     * @param {number} widthMm - Line width in mm
+     * @param {number} heightMm - Line height in mm
+     * @param {number} fontSizeMm - Font size in mm
+     * @param {string} font - Font family
+     * @param {Object} settings - Layout settings
+     * @param {number} textPaddingMm - Text padding in mm
+     */
     addLineToPage(page, text, yMm, xMm, widthMm, heightMm, fontSizeMm, font, settings, textPaddingMm = 0) {
         // 4-Line Guide System Layout:
         // Line 1 (top):    y + 0
@@ -295,7 +380,7 @@ class LayoutEngine {
         // Line 3:          y + height * 0.5
         // Line 4:          y + height * 0.75
 
-        // Add Guide Lines (all in MM)
+        // Add guide lines
         page.items.push({
             type: 'guide',
             xMm: xMm,
@@ -305,14 +390,9 @@ class LayoutEngine {
             style: settings.guideStyle
         });
 
-        // Add Text
+        // Add text if provided
         if (text) {
-            // Text positioning strategy:
-            // - Text should sit between Line 1 (0) and Line 3 (0.5)
-            // - Baseline should be at Line 3 (0.5)
-            // - Font size is 50% of grid height (distance from Line 1 to Line 3)
-
-            // Calculate baseline Y position (at Line 3) in MM
+            // Text baseline should be at Line 3 (0.5)
             const baselineYMm = yMm + (heightMm * 0.5);
 
             page.items.push({
@@ -328,10 +408,21 @@ class LayoutEngine {
         }
     }
 
+    /**
+     * Gets paper dimensions in millimeters
+     * @param {string} size - Paper size ('a4' or 'a3')
+     * @param {string} orientation - Orientation ('portrait' or 'landscape')
+     * @returns {Object} Object with width and height in mm
+     */
     getPaperDimensionsMm(size, orientation) {
         let width, height;
-        if (size === 'a3') { width = 297; height = 420; }
-        else { width = 210; height = 297; } // A4
+        if (size === 'a3') {
+            width = 297;
+            height = 420;
+        } else {
+            width = 210;
+            height = 297;
+        }
 
         if (orientation === 'landscape') {
             return { width: height, height: width };
@@ -339,21 +430,32 @@ class LayoutEngine {
         return { width, height };
     }
 
+    /**
+     * Normalizes text to NFC Unicode form
+     * @param {string} text - Text to normalize
+     * @returns {string} Normalized text
+     */
     normalizeText(text) {
         return text.normalize('NFC');
     }
 }
 
-// --- Renderers ---
+// ============================================================================
+// CANVAS PREVIEW RENDERER
+// ============================================================================
 
+/**
+ * Renders layout to canvas for preview
+ * @param {Object} layout - Layout object from LayoutEngine
+ * @param {string} canvasId - Canvas element ID
+ */
 function renderPreview(layout, canvasId) {
     const canvas = document.getElementById(canvasId);
     if (!canvas) return;
     const ctx = canvas.getContext('2d');
 
-    // Scale for high DPI
     const scale = 2;
-    const MM_TO_PX = MM_TO_PT * scale; // mm -> pt -> px
+    const MM_TO_PX = MM_TO_PT * scale;
 
     // Calculate total canvas height
     const pageGap = 20 * scale;
@@ -365,20 +467,20 @@ function renderPreview(layout, canvasId) {
     canvas.style.width = '100%';
     canvas.style.height = 'auto';
 
-    // Clear
-    ctx.fillStyle = '#eee'; // Background for the workspace
+    // Clear canvas
+    ctx.fillStyle = '#eee';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
     let pageY = 0;
 
     layout.pages.forEach(page => {
-        // Draw Page Background
+        // Draw page background
         ctx.fillStyle = 'white';
         ctx.fillRect(0, pageY, layout.widthMm * MM_TO_PX, pageHeightPx);
         ctx.strokeStyle = '#ccc';
         ctx.strokeRect(0, pageY, layout.widthMm * MM_TO_PX, pageHeightPx);
 
-        // Draw Items
+        // Draw page items
         page.items.forEach(item => {
             if (item.type === 'guide') {
                 drawGuideOnCanvas(ctx, item, MM_TO_PX, pageY);
@@ -395,6 +497,13 @@ function renderPreview(layout, canvasId) {
     });
 }
 
+/**
+ * Draws guide lines on canvas
+ * @param {CanvasRenderingContext2D} ctx - Canvas context
+ * @param {Object} item - Guide item
+ * @param {number} mmToPx - MM to pixel conversion factor
+ * @param {number} pageOffsetY - Page Y offset in pixels
+ */
 function drawGuideOnCanvas(ctx, item, mmToPx, pageOffsetY) {
     if (item.style === 'none') return;
 
@@ -408,7 +517,7 @@ function drawGuideOnCanvas(ctx, item, mmToPx, pageOffsetY) {
     ctx.strokeStyle = color;
     ctx.lineWidth = 1;
 
-    // Top line at 0 (solid)
+    // Top line (solid)
     ctx.beginPath();
     ctx.moveTo(x, y);
     ctx.lineTo(x + w, y);
@@ -449,9 +558,16 @@ function drawGuideOnCanvas(ctx, item, mmToPx, pageOffsetY) {
     ctx.stroke();
 }
 
+/**
+ * Draws practice text on canvas
+ * @param {CanvasRenderingContext2D} ctx - Canvas context
+ * @param {Object} item - Text item
+ * @param {number} mmToPx - MM to pixel conversion factor
+ * @param {number} pageOffsetY - Page Y offset in pixels
+ */
 function drawTextOnCanvas(ctx, item, mmToPx, pageOffsetY) {
     const x = item.xMm * mmToPx;
-    const y = item.yMm * mmToPx + pageOffsetY; // This is baseline y
+    const y = item.yMm * mmToPx + pageOffsetY;
 
     let color = 'black';
     if (item.color === 'grey') color = '#999';
@@ -459,10 +575,17 @@ function drawTextOnCanvas(ctx, item, mmToPx, pageOffsetY) {
 
     ctx.font = `${item.fontSizeMm * mmToPx}px "${item.font}"`;
     ctx.fillStyle = color;
-    ctx.textBaseline = 'alphabetic'; // Important: baseline at y position
+    ctx.textBaseline = 'alphabetic';
     ctx.fillText(item.text, x, y);
 }
 
+/**
+ * Draws page title on canvas
+ * @param {CanvasRenderingContext2D} ctx - Canvas context
+ * @param {Object} item - Title item
+ * @param {number} mmToPx - MM to pixel conversion factor
+ * @param {number} pageOffsetY - Page Y offset in pixels
+ */
 function drawTitleOnCanvas(ctx, item, mmToPx, pageOffsetY) {
     const x = item.xMm * mmToPx;
     const y = item.yMm * mmToPx + pageOffsetY;
@@ -472,9 +595,16 @@ function drawTitleOnCanvas(ctx, item, mmToPx, pageOffsetY) {
     ctx.textAlign = 'center';
     ctx.textBaseline = 'top';
     ctx.fillText(item.text, x, y);
-    ctx.textAlign = 'left'; // Reset
+    ctx.textAlign = 'left';
 }
 
+/**
+ * Draws page footer on canvas
+ * @param {CanvasRenderingContext2D} ctx - Canvas context
+ * @param {Object} item - Footer item
+ * @param {number} mmToPx - MM to pixel conversion factor
+ * @param {number} pageOffsetY - Page Y offset in pixels
+ */
 function drawFooterOnCanvas(ctx, item, mmToPx, pageOffsetY) {
     const x = item.xMm * mmToPx;
     const y = item.yMm * mmToPx + pageOffsetY;
@@ -484,18 +614,25 @@ function drawFooterOnCanvas(ctx, item, mmToPx, pageOffsetY) {
     ctx.textAlign = 'center';
     ctx.textBaseline = 'top';
     ctx.fillText(item.text, x, y);
-    ctx.textAlign = 'left'; // Reset
+    ctx.textAlign = 'left';
 }
 
+// ============================================================================
+// PDF GENERATOR
+// ============================================================================
+
+/**
+ * Generates and downloads PDF from layout
+ * @param {Object} layout - Layout object from LayoutEngine
+ */
 function generatePDF(layout) {
     const docContent = [];
 
-    // Convert layout dimensions from mm to pt
     const widthPt = layout.widthMm * MM_TO_PT;
     const heightPt = layout.heightMm * MM_TO_PT;
 
     layout.pages.forEach((page, index) => {
-        // Page Break for subsequent pages
+        // Add page break for subsequent pages
         if (index > 0) {
             docContent.push({ text: '', pageBreak: 'before' });
         }
@@ -505,7 +642,6 @@ function generatePDF(layout) {
                 if (item.style === 'none') return;
                 const color = item.style === 'light' ? '#dcdcdc' : '#999';
 
-                // Convert mm to pt
                 const xPt = item.xMm * MM_TO_PT;
                 const yPt = item.yMm * MM_TO_PT;
                 const widthPt = item.widthMm * MM_TO_PT;
@@ -514,12 +650,12 @@ function generatePDF(layout) {
                 // Draw 4 horizontal lines + 2 vertical lines
                 docContent.push({
                     canvas: [
-                        { type: 'line', x1: 0, y1: 0, x2: widthPt, y2: 0, lineWidth: 0.5, lineColor: color }, // Top (solid)
-                        { type: 'line', x1: 0, y1: heightPt * 0.25, x2: widthPt, y2: heightPt * 0.25, lineWidth: 0.5, lineColor: color, dash: { length: 2 } }, // 0.25 (dashed)
-                        { type: 'line', x1: 0, y1: heightPt * 0.5, x2: widthPt, y2: heightPt * 0.5, lineWidth: 0.5, lineColor: color }, // 0.5 (solid)
-                        { type: 'line', x1: 0, y1: heightPt * 0.75, x2: widthPt, y2: heightPt * 0.75, lineWidth: 0.5, lineColor: color, dash: { length: 2 } }, // 0.75 (dashed)
-                        { type: 'line', x1: 0, y1: 0, x2: 0, y2: heightPt * 0.75, lineWidth: 0.5, lineColor: color }, // Left vertical
-                        { type: 'line', x1: widthPt, y1: 0, x2: widthPt, y2: heightPt * 0.75, lineWidth: 0.5, lineColor: color } // Right vertical
+                        { type: 'line', x1: 0, y1: 0, x2: widthPt, y2: 0, lineWidth: 0.5, lineColor: color },
+                        { type: 'line', x1: 0, y1: heightPt * 0.25, x2: widthPt, y2: heightPt * 0.25, lineWidth: 0.5, lineColor: color, dash: { length: 2 } },
+                        { type: 'line', x1: 0, y1: heightPt * 0.5, x2: widthPt, y2: heightPt * 0.5, lineWidth: 0.5, lineColor: color },
+                        { type: 'line', x1: 0, y1: heightPt * 0.75, x2: widthPt, y2: heightPt * 0.75, lineWidth: 0.5, lineColor: color, dash: { length: 2 } },
+                        { type: 'line', x1: 0, y1: 0, x2: 0, y2: heightPt * 0.75, lineWidth: 0.5, lineColor: color },
+                        { type: 'line', x1: widthPt, y1: 0, x2: widthPt, y2: heightPt * 0.75, lineWidth: 0.5, lineColor: color }
                     ],
                     absolutePosition: { x: xPt, y: yPt }
                 });
@@ -528,13 +664,11 @@ function generatePDF(layout) {
                 if (item.color === 'grey') color = '#999';
                 else if (item.color === 'light') color = '#dcdcdc';
 
-                // Convert mm to pt
                 const xPt = item.xMm * MM_TO_PT;
                 const baselineYPt = item.yMm * MM_TO_PT;
                 const fontSizePt = item.fontSizeMm * MM_TO_PT;
 
-                // pdfmake positions text from top-left, but we have baseline Y
-                // Each font renders differently in pdfmake vs canvas, so we need font-specific corrections
+                // Font-specific correction factors for PDF rendering
                 const fontCorrectionFactors = {
                     'LessonOne': 1.27,
                     'OpenHuninn': 1.00,
@@ -543,7 +677,6 @@ function generatePDF(layout) {
                 };
 
                 const correctionFactor = fontCorrectionFactors[item.font] || 0.95;
-                // Estimate ascent based on font size
                 const estimatedAscent = fontSizePt * 0.85;
                 const correctedAscent = estimatedAscent * correctionFactor;
                 const topY = baselineYPt - correctedAscent;
@@ -556,7 +689,6 @@ function generatePDF(layout) {
                     absolutePosition: { x: xPt, y: topY }
                 });
             } else if (item.type === 'title') {
-                // Convert mm to pt
                 const yPt = item.yMm * MM_TO_PT;
                 const fontSizePt = item.fontSizeMm * MM_TO_PT;
 
@@ -567,10 +699,9 @@ function generatePDF(layout) {
                     bold: true,
                     alignment: 'center',
                     absolutePosition: { x: 0, y: yPt },
-                    width: widthPt // Full page width for centering
+                    width: widthPt
                 });
             } else if (item.type === 'footer') {
-                // Convert mm to pt
                 const yPt = item.yMm * MM_TO_PT;
                 const fontSizePt = item.fontSizeMm * MM_TO_PT;
 
@@ -581,7 +712,7 @@ function generatePDF(layout) {
                     color: '#999',
                     alignment: 'center',
                     absolutePosition: { x: 0, y: yPt },
-                    width: widthPt // Ensure centering works
+                    width: widthPt
                 });
             }
         });
@@ -589,20 +720,22 @@ function generatePDF(layout) {
 
     const docDefinition = {
         pageSize: { width: widthPt, height: heightPt },
-        pageMargins: [0, 0, 0, 0], // We handle margins
+        pageMargins: [0, 0, 0, 0],
         content: docContent,
         defaultStyle: {
-            font: 'Iansui' // Default
+            font: 'Iansui'
         }
     };
 
     pdfMake.createPdf(docDefinition).download('POJ_Liansip_Choa.pdf');
 }
 
-// --- Main Integration ---
+// ============================================================================
+// MAIN APPLICATION
+// ============================================================================
 
 document.addEventListener('DOMContentLoaded', () => {
-    // UI Elements
+    // UI element references
     const ui = {
         generateBtn: document.getElementById('generateBtn'),
         inputText: document.getElementById('inputText'),
@@ -621,14 +754,15 @@ document.addEventListener('DOMContentLoaded', () => {
         clearTextBtn: document.getElementById('clearTextBtn')
     };
 
-    // Initialize Language
+    // Initialize language
     if (typeof currentLanguage !== 'undefined') {
         ui.languageSelect.value = currentLanguage;
         updateUILanguage();
     }
+
+    // Language change handler
     ui.languageSelect.addEventListener('change', (e) => {
         switchLanguage(e.target.value);
-        // Update preset title when language changes
         const currentPreset = ui.presetSelect.value;
         if (currentPreset !== 'custom' && PRESETS[currentPreset]) {
             const lang = e.target.value;
@@ -636,11 +770,23 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // Clear Buttons
-    if (ui.clearTitleBtn) ui.clearTitleBtn.addEventListener('click', () => { ui.pageTitle.value = ''; update(); });
-    if (ui.clearTextBtn) ui.clearTextBtn.addEventListener('click', () => { ui.inputText.value = ''; update(); });
+    // Clear button handlers
+    if (ui.clearTitleBtn) {
+        ui.clearTitleBtn.addEventListener('click', () => {
+            ui.pageTitle.value = '';
+            update();
+        });
+    }
+    if (ui.clearTextBtn) {
+        ui.clearTextBtn.addEventListener('click', () => {
+            ui.inputText.value = '';
+            update();
+        });
+    }
 
-    // Update Logic
+    /**
+     * Updates preview based on current settings
+     */
     const update = () => {
         const settings = {
             text: ui.inputText.value,
@@ -653,10 +799,8 @@ document.addEventListener('DOMContentLoaded', () => {
             followingLines: ui.followingLines.value,
             guideStyle: ui.guideStyle.value,
             textStyle: ui.textStyle.value,
-
         };
 
-        // Create a dummy canvas for measurement
         const measureCanvas = document.createElement('canvas');
         const ctx = measureCanvas.getContext('2d');
         const engine = new LayoutEngine(ctx);
@@ -664,11 +808,10 @@ document.addEventListener('DOMContentLoaded', () => {
         const layout = engine.generateLayout(settings);
         renderPreview(layout, 'previewCanvas');
 
-        // Store layout for PDF generation
         window.currentLayout = layout;
     };
 
-    // Event Listeners
+    // Input change listeners
     const inputs = [
         ui.inputText, ui.paperSize, ui.lineHeight, ui.fontSelect,
         ui.pageTitle, ui.orientation, ui.practiceMode, ui.followingLines,
@@ -678,13 +821,12 @@ document.addEventListener('DOMContentLoaded', () => {
         if (input) input.addEventListener('input', update);
     });
 
-    // Preset Selection Handler
+    // Preset selection handler
     ui.presetSelect.addEventListener('change', (e) => {
         const val = e.target.value;
         if (val !== 'custom' && PRESETS[val]) {
             const preset = PRESETS[val];
             ui.inputText.value = preset.text;
-            // Set title based on current language
             const lang = currentLanguage || 'poj';
             ui.pageTitle.value = preset.title[lang] || preset.title.poj;
             update();
@@ -706,6 +848,8 @@ document.addEventListener('DOMContentLoaded', () => {
             ui.presetSelect.value = 'custom';
         }
     });
+
+    // PDF generation handler
     ui.generateBtn.addEventListener('click', () => {
         if (window.currentLayout) {
             ui.generateBtn.textContent = 'Generating...';
@@ -723,9 +867,8 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // Initial Load
+    // Initial load
     loadPreviewFonts().then(() => {
-        // Load default preset on initial page load
         const initialPreset = ui.presetSelect.value;
         if (initialPreset !== 'custom' && PRESETS[initialPreset]) {
             const preset = PRESETS[initialPreset];
@@ -736,12 +879,3 @@ document.addEventListener('DOMContentLoaded', () => {
         update();
     });
 });
-
-// Helper: Map filename to font family
-function getFontFamilyName(filename) {
-    if (filename === 'Iansui-Regular.ttf') return 'Iansui';
-    if (filename === 'jf-openhuninn.ttf') return 'OpenHuninn';
-    if (filename === 'ChiayiCity.ttf') return 'ChiayiCity';
-    if (filename === 'LessonOne-Regular.ttf') return 'LessonOne';
-    return 'Iansui';
-}

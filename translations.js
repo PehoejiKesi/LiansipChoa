@@ -1,11 +1,14 @@
-// Translations for POJ Handwriting Practice Generator
+/**
+ * Translation System for POJ Handwriting Practice Generator
+ * Supports English (en) and Pe̍h-ōe-jī (poj) languages
+ */
+
+// Translation data for all UI elements
 const translations = {
     en: {
         // Header
         title: "POJ Handwriting Practice Generator",
         subtitle: "Generate PDF worksheets for Pe̍h-ōe-jī handwriting practice.",
-
-        // Language Switcher
         language: "EN",
 
         // Text Settings Section
@@ -53,7 +56,6 @@ const translations = {
         textStyleGrey: "Grey (for Tracing)",
         textStyleLight: "Light Grey (for Tracing)",
 
-
         // Buttons
         generatePDF: "Generate PDF",
         clearButton: "Clear",
@@ -66,8 +68,6 @@ const translations = {
         // Header
         title: "Pe̍h-ōe-jī Chhiú-siá Liān-si̍p Chóa Chè-chō Ki-á",
         subtitle: "Chè-chō Pe̍h-ōe-jī chhiú-siá liān-si̍p chóa PDF tòng-àn ê ke-si.",
-
-        // Language Switcher
         language: "POJ",
 
         // Text Settings Section
@@ -115,7 +115,6 @@ const translations = {
         guideStyleNone: "Bián Sòaⁿ",
         lineHeight: "1 Chōa Gōa Koân (mm):",
 
-
         // Buttons
         generatePDF: "Chò PDF Tòng-àn",
         clearButton: "Thâi",
@@ -128,78 +127,95 @@ const translations = {
 // Get current language from localStorage or default to POJ
 let currentLanguage = localStorage.getItem('pojLang') || 'poj';
 
-// Function to get translated text
+/**
+ * Gets translated text for a given key
+ * @param {string} key - Translation key
+ * @returns {string} Translated text
+ */
 function t(key) {
     return translations[currentLanguage][key] || translations.en[key] || key;
 }
 
-// Function to switch language
+/**
+ * Switches the current language and updates UI
+ * @param {string} lang - Language code ('en' or 'poj')
+ */
 function switchLanguage(lang) {
     currentLanguage = lang;
     localStorage.setItem('pojLang', lang);
     updateUILanguage();
 }
 
-// Function to update all UI text
+/**
+ * Updates all UI text elements with current language translations
+ * Uses more robust selectors to avoid fragile array indexing
+ */
 function updateUILanguage() {
+    // Helper function to safely update element text
+    const updateText = (selector, text) => {
+        const element = document.querySelector(selector);
+        if (element) element.textContent = text;
+    };
+
+    const updatePlaceholder = (selector, text) => {
+        const element = document.querySelector(selector);
+        if (element) element.placeholder = text;
+    };
+
     // Header
-    document.querySelector('h1').textContent = t('title');
-    document.querySelector('header p').textContent = t('subtitle');
+    updateText('h1', t('title'));
+    updateText('header p', t('subtitle'));
 
-    // Language selector
-    // Label removed from header
+    // Text Settings Section
+    updateText('.settings-section:nth-of-type(1) h3', t('textSettings'));
+    updateText('label[for="pageTitle"]', t('pageTitle'));
+    updateText('label[for="presetSelect"]', t('preset'));
+    updateText('#presetSelect option[value="empty"]', t('presetEmpty'));
+    updateText('#presetSelect option[value="default"]', t('presetDefault'));
+    updateText('#presetSelect option[value="vowels"]', t('presetVowels'));
+    updateText('#presetSelect option[value="consonants"]', t('presetConsonants'));
+    updateText('#presetSelect option[value="tones"]', t('presetTones'));
+    updatePlaceholder('#pageTitle', t('pageTitlePlaceholder'));
+    updateText('label[for="inputText"]', t('textToPractice'));
+    updatePlaceholder('#inputText', t('textPlaceholder'));
 
-    // Text Settings
-    document.querySelectorAll('.settings-section h3')[0].textContent = t('textSettings');
-    document.querySelector('label[for="pageTitle"]').textContent = t('pageTitle');
-    document.querySelector('label[for="presetSelect"]').textContent = t('preset');
-    document.querySelectorAll('#presetSelect option')[0].textContent = t('presetEmpty');
-    document.querySelectorAll('#presetSelect option')[1].textContent = t('presetDefault');
-    document.querySelectorAll('#presetSelect option')[2].textContent = t('presetVowels');
-    document.querySelectorAll('#presetSelect option')[3].textContent = t('presetConsonants');
-    document.querySelectorAll('#presetSelect option')[4].textContent = t('presetTones');
-    document.getElementById('pageTitle').placeholder = t('pageTitlePlaceholder');
-    document.querySelector('label[for="inputText"]').textContent = t('textToPractice');
-    document.getElementById('inputText').placeholder = t('textPlaceholder');
+    // Page Settings Section
+    updateText('.settings-section:nth-of-type(2) h3', t('pageSettings'));
+    updateText('label[for="paperSize"]', t('paperSize'));
+    updateText('#paperSize option[value="a4"]', t('paperSizeA4'));
+    updateText('#paperSize option[value="a3"]', t('paperSizeA3'));
+    updateText('label[for="orientation"]', t('orientation'));
+    updateText('#orientation option[value="portrait"]', t('orientationPortrait'));
+    updateText('#orientation option[value="landscape"]', t('orientationLandscape'));
 
-    // Page Settings
-    document.querySelectorAll('.settings-section h3')[1].textContent = t('pageSettings');
-    document.querySelector('label[for="paperSize"]').textContent = t('paperSize');
-    document.querySelectorAll('#paperSize option')[0].textContent = t('paperSizeA4');
-    document.querySelectorAll('#paperSize option')[1].textContent = t('paperSizeA3');
-    document.querySelector('label[for="orientation"]').textContent = t('orientation');
-    document.querySelectorAll('#orientation option')[0].textContent = t('orientationPortrait');
-    document.querySelectorAll('#orientation option')[1].textContent = t('orientationLandscape');
-
-    // Handwriting Settings
-    document.querySelectorAll('.settings-section h3')[2].textContent = t('handwritingSettings');
-    document.querySelector('label[for="fontSelect"]').textContent = t('font');
-    document.querySelectorAll('#fontSelect option')[0].textContent = t('fontLessonOne');
-    document.querySelectorAll('#fontSelect option')[1].textContent = t('fontOpenHuninn');
-    document.querySelectorAll('#fontSelect option')[2].textContent = t('fontIansui');
-    document.querySelectorAll('#fontSelect option')[3].textContent = t('fontChiayiCity');
-    document.querySelector('label[for="practiceMode"]').textContent = t('mode');
-    document.querySelectorAll('#practiceMode option')[0].textContent = t('modeTracing');
-    document.querySelectorAll('#practiceMode option')[1].textContent = t('modeCopying');
-    document.querySelector('label[for="followingLines"]').textContent = t('followingLines');
-    document.querySelectorAll('#followingLines option')[0].textContent = t('followingLinesFill');
-    document.querySelectorAll('#followingLines option')[1].textContent = t('followingLinesBlank');
-    document.querySelector('label[for="lineHeight"]').textContent = t('lineHeight');
-    document.querySelector('label[for="guideStyle"]').textContent = t('guideStyle');
-    document.querySelectorAll('#guideStyle option')[0].textContent = t('guideStyleNormal');
-    document.querySelectorAll('#guideStyle option')[1].textContent = t('guideStyleLight');
-    document.querySelectorAll('#guideStyle option')[2].textContent = t('guideStyleNone');
-    document.querySelector('label[for="textStyle"]').textContent = t('textStyle');
-    document.querySelectorAll('#textStyle option')[0].textContent = t('textStyleBlack');
-    document.querySelectorAll('#textStyle option')[1].textContent = t('textStyleGrey');
-    document.querySelectorAll('#textStyle option')[2].textContent = t('textStyleLight');
-
+    // Handwriting Settings Section
+    updateText('.settings-section:nth-of-type(3) h3', t('handwritingSettings'));
+    updateText('label[for="fontSelect"]', t('font'));
+    updateText('#fontSelect option[value="LessonOne-Regular.ttf"]', t('fontLessonOne'));
+    updateText('#fontSelect option[value="jf-openhuninn.ttf"]', t('fontOpenHuninn'));
+    updateText('#fontSelect option[value="Iansui-Regular.ttf"]', t('fontIansui'));
+    updateText('#fontSelect option[value="ChiayiCity.ttf"]', t('fontChiayiCity'));
+    updateText('label[for="practiceMode"]', t('mode'));
+    updateText('#practiceMode option[value="tracing"]', t('modeTracing'));
+    updateText('#practiceMode option[value="copying"]', t('modeCopying'));
+    updateText('label[for="followingLines"]', t('followingLines'));
+    updateText('#followingLines option[value="fill"]', t('followingLinesFill'));
+    updateText('#followingLines option[value="blank"]', t('followingLinesBlank'));
+    updateText('label[for="lineHeight"]', t('lineHeight'));
+    updateText('label[for="guideStyle"]', t('guideStyle'));
+    updateText('#guideStyle option[value="normal"]', t('guideStyleNormal'));
+    updateText('#guideStyle option[value="light"]', t('guideStyleLight'));
+    updateText('#guideStyle option[value="none"]', t('guideStyleNone'));
+    updateText('label[for="textStyle"]', t('textStyle'));
+    updateText('#textStyle option[value="black"]', t('textStyleBlack'));
+    updateText('#textStyle option[value="grey"]', t('textStyleGrey'));
+    updateText('#textStyle option[value="light"]', t('textStyleLight'));
 
     // Buttons
-    document.getElementById('generateBtn').textContent = t('generatePDF');
-    document.getElementById('clearTitleBtn').textContent = t('clearButton');
-    document.getElementById('clearTextBtn').textContent = t('clearButton');
+    updateText('#generateBtn', t('generatePDF'));
+    updateText('#clearTitleBtn', t('clearButton'));
+    updateText('#clearTextBtn', t('clearButton'));
 
     // Preview
-    document.querySelector('.preview-section h2').textContent = t('preview');
+    updateText('.preview-section h2', t('preview'));
 }

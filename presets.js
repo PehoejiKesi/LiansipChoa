@@ -1,4 +1,10 @@
-// Preset Data for POJ Handwriting Practice Generator
+/**
+ * Preset Data for POJ Handwriting Practice Generator
+ * 
+ * Each preset contains:
+ * - title: Object with 'en' and 'poj' language variants
+ * - text: Practice text content
+ */
 const PRESETS = {
     'empty': {
         title: {
@@ -7,6 +13,8 @@ const PRESETS = {
         },
         text: ``
     },
+
+    // Default practice text
     'default': {
         title: {
             en: 'POJ Handwriting Practice',
@@ -14,6 +22,8 @@ const PRESETS = {
         },
         text: `Góa chiok kah-ì siá Pe̍h-ōe-jī.`
     },
+
+    // Vowel practice: A, I, U, O͘, E, O
     'vowels': {
         title: {
             en: 'POJ Vowels Practice',
@@ -29,6 +39,8 @@ A  I  U  O͘  E  O   a  i  u  o͘  e  o
 A  I  U  O͘  E  O   a  i  u  o͘  e  o
 A-î ū o͘-ê--bô?  A-î ū o͘-ê--bô?`
     },
+
+    // Consonant practice: P, Ph, M, B, T, Th, N, L, K, Kh, Ng, G, H, Ch, Chh, S, J
     'consonants': {
         title: {
             en: 'POJ Consonants Practice',
@@ -53,6 +65,8 @@ S S S S S S S   s  s  s  s  s  s  s
 J J J J J J J   j   j   j   j   j   j   j
 A-pô tì bō-á.  Gô-á mo͘ n̂g-n̂g.`
     },
+
+    // Tone marks practice: All 8 tones for each vowel
     'tones': {
         title: {
             en: 'POJ Tone Marks Practice',
@@ -64,9 +78,9 @@ I   Í   Ì   Ih   Î   Ī   I̍h   Ĭ
 i   í   ì   ih   î   ī   i̍h   ĭ
 U   Ú   Ù   Uh   Û   Ū   U̍h   Ŭ
 u   ú   ù   uh   û   ū   u̍h   ŭ
-O͘   Ó͘   Ò͘   O͘h   Ô͘   Ō͘   O̍͘h   Ŏ͘
-o͘   ó͘   ò͘   o͘h   ô͘   ō͘   o̍͘h   ŏ͘
-sai hó͘ pà pih  kâu chhiūⁿ lo̍k
+O͘   Ó͘   Ò͘   O͘h   Ô͘   Ō͘   O̍͘h   Ŏ͘
+o͘   ó͘   ò͘   o͘h   ô͘   ō͘   o̍͘h   ŏ͘
+sai hó͘ pà pih  kâu chhiūⁿ lo̍k
 E   É   È   Eh   Ê   Ē   E̍h   Ĕ
 e   é   è   eh   ê   ē   e̍h   ĕ
 O   Ó   Ò   Oh   Ô   Ō   O̍h   Ŏ
