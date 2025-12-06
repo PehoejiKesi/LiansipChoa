@@ -9,8 +9,8 @@
             id: 'vowels',
             date: '2025-12-06',
             tags: ['vowels', 'beginner', 'alphabet'],
-            image: 'assets/premade/preview/POJ_LiansipChoa_Vowels.jpg',
-            pdfUrl: 'assets/premade/POJ_LiansipChoa_Vowels.pdf',
+            image: 'assets/premade/preview/POJ_LiansipChoa_Boim.jpg',
+            pdfUrl: 'assets/premade/POJ_LiansipChoa_Boim.pdf',
             description: {
                 en: 'a, i, u, o͘, e, o',
                 poj: 'a, i, u, o͘, e, o'
@@ -20,8 +20,8 @@
             id: 'consonants',
             date: '2025-12-06',
             tags: ['consonants', 'beginner', 'alphabet'],
-            image: 'assets/premade/preview/POJ_LiansipChoa_Consonants.jpg',
-            pdfUrl: 'assets/premade/POJ_LiansipChoa_Consonants.pdf',
+            image: 'assets/premade/preview/POJ_LiansipChoa_Chuim.jpg',
+            pdfUrl: 'assets/premade/POJ_LiansipChoa_Chuim.pdf',
             description: {
                 en: 'p, ph, m, b...',
                 poj: 'p, ph, m, b...'
@@ -31,8 +31,8 @@
             id: 'tones',
             date: '2025-12-06',
             tags: ['tones', 'beginner'],
-            image: 'assets/premade/preview/POJ_LiansipChoa_Tones.jpg',
-            pdfUrl: 'assets/premade/POJ_LiansipChoa_Tones.pdf',
+            image: 'assets/premade/preview/POJ_LiansipChoa_Sianntiau.jpg',
+            pdfUrl: 'assets/premade/POJ_LiansipChoa_Sianntiau.pdf',
             description: {
                 en: '8 tones',
                 poj: '8 siaⁿ-tiāu'
@@ -42,8 +42,8 @@
             id: 'nasal_vowels',
             date: '2025-12-06',
             tags: ['nasal', 'vowels', 'beginner'],
-            image: 'assets/premade/preview/POJ_LiansipChoa_NasalVowels.jpg',
-            pdfUrl: 'assets/premade/POJ_LiansipChoa_NasalVowels.pdf',
+            image: 'assets/premade/preview/POJ_LiansipChoa_PhinnimHoaKooBoimJiboe.jpg',
+            pdfUrl: 'assets/premade/POJ_LiansipChoa_PhinnimHoaKooBoimJiboe.pdf',
             description: {
                 en: 'aⁿ, iⁿ, oⁿ, eⁿ',
                 poj: 'aⁿ, iⁿ, oⁿ, eⁿ'
@@ -53,11 +53,22 @@
             id: 'nasal_diphthongs',
             date: '2025-12-06',
             tags: ['nasal', 'beginner'],
-            image: 'assets/premade/preview/POJ_LiansipChoa_NasalDiphthongs.jpg',
-            pdfUrl: 'assets/premade/POJ_LiansipChoa_NasalDiphthongs.pdf',
+            image: 'assets/premade/preview/POJ_LiansipChoa_PhinnimHoaHokBoimJiboe.jpg',
+            pdfUrl: 'assets/premade/POJ_LiansipChoa_PhinnimHoaHokBoimJiboe.pdf',
             description: {
                 en: 'aiⁿ, auⁿ, iaⁿ, iuⁿ...',
                 poj: 'aiⁿ, auⁿ, iaⁿ, iuⁿ...'
+            }
+        },
+        {
+            id: 'nasal_codas',
+            date: '2025-12-06',
+            tags: ['nasal', 'beginner'],
+            image: 'assets/premade/preview/POJ_LiansipChoa_PhinnChuimBoeliuJiboe.jpg',
+            pdfUrl: 'assets/premade/POJ_LiansipChoa_PhinnChuimBoeliuJiboe.pdf',
+            description: {
+                en: 'am, an, ang...',
+                poj: 'am, an, ang...'
             }
         }
     ];

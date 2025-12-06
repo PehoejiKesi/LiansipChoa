@@ -33,6 +33,7 @@
             // Handwriting Settings
             handwritingSettings: "Handwriting Settings",
             font: "Font:",
+            presetNasalCodas: "Nasal Codas (Am, An, Ang...)",
             fontIansui: "Iansui",
             fontOpenHuninn: "Open Huninn",
             fontChiayiCity: "Chiayi City",
@@ -55,6 +56,8 @@
 
             // Buttons
             generatePDF: "Generate PDF",
+            btnViewPDF: "View PDF (New Tab)",
+            btnDownloadPDF: "Download PDF",
             clearButton: "Clear",
 
             // Tabs
@@ -104,6 +107,7 @@
             // Handwriting Settings
             handwritingSettings: "Keh-sek Siáⁿ Khoán",
             font: "Jī-thé:",
+            presetNasalCodas: "Phīⁿ Chú-im Bóe-liu Jī-bóe (Am, An, Ang...)",
             fontIansui: "Iansui",
             fontOpenHuninn: "Open Huninn",
             fontChiayiCity: "Chiayi City",
@@ -126,6 +130,8 @@
 
             // Buttons
             generatePDF: "Chò PDF Tòng-àn",
+            btnViewPDF: "Khòaⁿ PDF (Siaⁿ-ia̍h)",
+            btnDownloadPDF: "Táng-ló͘ PDF",
             clearButton: "Thâi",
 
             // Tabs

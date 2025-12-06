@@ -9,7 +9,6 @@ window.App.Core.pdfGenerator = function (layout, pageTitle = '') {
     const MM_TO_PT = C.MM_TO_PT;
 
     const docContent = [];
-
     const widthPt = layout.widthMm * MM_TO_PT;
     const heightPt = layout.heightMm * MM_TO_PT;
 
@@ -100,7 +99,23 @@ window.App.Core.pdfGenerator = function (layout, pageTitle = '') {
         });
     });
 
+    // Generate filename with title
+    let filename = 'POJ_LiansipChoa.pdf';
+    let cleanTitle = 'POJ_LiansipChoa';
+    if (pageTitle && pageTitle.trim()) {
+        // Sanitize title for filename (remove invalid characters)
+        const sanitizedTitle = pageTitle.trim().replace(/[/\\?%*:|"<>]/g, '-');
+        filename = sanitizedTitle + '.pdf';
+        cleanTitle = sanitizedTitle;
+    }
+
     const docDefinition = {
+        info: {
+            title: cleanTitle,
+            author: 'Pehoeji Kesi',
+            subject: 'Writing Practice Sheet',
+            creator: 'Pehoeji Kesi Generator'
+        },
         pageSize: { width: widthPt, height: heightPt },
         pageMargins: [0, 0, 0, 0],
         content: docContent,
@@ -109,14 +124,19 @@ window.App.Core.pdfGenerator = function (layout, pageTitle = '') {
         }
     };
 
-    // Generate filename with title
-    let filename = 'POJ_LiansipChoa';
-    if (pageTitle && pageTitle.trim()) {
-        // Sanitize title for filename (remove invalid characters)
-        const sanitizedTitle = pageTitle.trim().replace(/[/\\?%*:|"<>]/g, '-');
-        filename += '_' + sanitizedTitle;
-    }
-    filename += '.pdf';
-
-    pdfMake.createPdf(docDefinition).open();
+    // Use Blob and File API to attempt to enforce filename while opening in new tab
+    pdfMake.createPdf(docDefinition).getBlob((blob) => {
+        try {
+            // Try to create a File object with the correct name
+            const file = new File([blob], filename, { type: 'application/pdf' });
+            const url = URL.createObjectURL(file);
+            window.open(url, '_blank');
+        } catch (e) {
+            // Fallback for browsers that don't support File constructor fully or if it fails
+            console.warn('File constructor failed, falling back to Blob URL', e);
+            const url = URL.createObjectURL(blob);
+            window.open(url, '_blank');
+        }
+    });
 }
+
