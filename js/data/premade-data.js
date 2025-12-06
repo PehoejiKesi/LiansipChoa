@@ -13,8 +13,8 @@
             id: 'vowels',
             date: '2025-12-06',
             tags: ['vowels', 'beginner', 'alphabet'],
-            image: 'assets/premade/preview/POJ_LiansipChoa_Liān-si̍p Siá Pe̍h-ōe-jī Bó-im.png',
-            pdfUrl: 'assets/premade/POJ_LiansipChoa_Liān-si̍p Siá Pe̍h-ōe-jī Bó-im.pdf',
+            image: 'assets/premade/preview/POJ_LiansipChoa_Vowels.png',
+            pdfUrl: 'assets/premade/POJ_LiansipChoa_Vowels.pdf',
             description: {
                 en: 'Vowels: a, i, u, o͘, e, o',
                 poj: 'Bó-im: a, i, u, o͘, e, o'
@@ -24,8 +24,8 @@
             id: 'consonants',
             date: '2025-12-06',
             tags: ['consonants', 'beginner', 'alphabet'],
-            image: 'assets/premade/preview/POJ_LiansipChoa_Liān-si̍p Siá Pe̍h-ōe-jī Chú-im.png',
-            pdfUrl: 'assets/premade/POJ_LiansipChoa_Liān-si̍p Siá Pe̍h-ōe-jī Chú-im.pdf',
+            image: 'assets/premade/preview/POJ_LiansipChoa_Consonants.png',
+            pdfUrl: 'assets/premade/POJ_LiansipChoa_Consonants.pdf',
             description: {
                 en: 'Consonants: p, ph, m, b...',
                 poj: 'Chú-im: p, ph, m, b...'
@@ -35,8 +35,8 @@
             id: 'tones',
             date: '2025-12-06',
             tags: ['tones', 'beginner'],
-            image: 'assets/premade/preview/POJ_LiansipChoa_Liān-si̍p Siá Pe̍h-ōe-jī Siaⁿ-tiāu.png',
-            pdfUrl: 'assets/premade/POJ_LiansipChoa_Liān-si̍p Siá Pe̍h-ōe-jī Siaⁿ-tiāu.pdf',
+            image: 'assets/premade/preview/POJ_LiansipChoa_Tones.png',
+            pdfUrl: 'assets/premade/POJ_LiansipChoa_Tones.pdf',
             description: {
                 en: 'Tones: 8 tones',
                 poj: '8 Siaⁿ-tiāu'

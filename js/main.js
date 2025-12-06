@@ -221,12 +221,25 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         }
         // URL to Tab mapping
-        const urlToTab = {
-            '/liah': 'premade'
+        // Dynamic Base Path Detection to support subdirectories (like /LiansipChoa/)
+        const getBasePath = () => {
+            const path = window.location.pathname;
+            // If path ends with /liah, strip it
+            if (path.endsWith('/liah')) {
+                return path.slice(0, -5);
+            }
+            // If path ends with /index.html, strip it
+            if (path.endsWith('/index.html')) {
+                return path.slice(0, -11);
+            }
+            // Trailing slash handling
+            if (path.endsWith('/')) {
+                return path.slice(0, -1);
+            }
+            return path;
         };
-        const tabToUrl = {
-            'premade': '/liah'
-        };
+
+        const basePath = getBasePath();
 
         // Tab Switching
         const tabBtns = document.querySelectorAll('.tab-btn');
@@ -258,10 +271,12 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             // Update URL if needed
-            if (updateUrl && tabToUrl[tabId]) {
-                history.pushState({ tab: tabId }, '', tabToUrl[tabId]);
-            } else if (updateUrl && tabId === 'generator') {
-                history.pushState({ tab: tabId }, '', '/');
+            if (updateUrl) {
+                let newPath = basePath + '/';
+                if (tabId === 'premade') {
+                    newPath = basePath + '/liah';
+                }
+                history.pushState({ tab: tabId }, '', newPath);
             }
         };
 
@@ -277,17 +292,24 @@ document.addEventListener('DOMContentLoaded', () => {
             if (event.state && event.state.tab) {
                 switchToTab(event.state.tab, false);
             } else {
-                // Check current path
+                // Check current path to determine tab
                 const path = window.location.pathname;
-                const tabId = urlToTab[path] || 'generator';
+                let tabId = 'generator'; // Default
+                if (path.endsWith('/liah')) {
+                    tabId = 'premade';
+                }
                 switchToTab(tabId, false);
             }
         });
 
         // Check URL on initial load
         const initialPath = window.location.pathname;
-        const initialTab = urlToTab[initialPath];
-        if (initialTab) {
+        let initialTab = 'generator';
+        if (initialPath.endsWith('/liah')) {
+            initialTab = 'premade';
+        }
+        // Only switch if we need to show premade, otherwise default is fine (HTML is active on generator)
+        if (initialTab !== 'generator') {
             switchToTab(initialTab, false);
         }
     }
