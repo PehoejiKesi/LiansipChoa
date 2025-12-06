@@ -143,7 +143,7 @@
 
             // Tabs
             tabGenerator: "Chè-chō Ki-á",
-            tabPremade: "Lia̍h Chò hó--ê",
+            tabPremade: "Lia̍h Chò Hó--ê",
 
             // Premade Section
             premadeVowelsTitle: "Bó-im",
