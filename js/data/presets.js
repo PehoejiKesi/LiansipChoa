@@ -22,7 +22,11 @@
 (function () {
     const PRESETS = {
         'empty': {
-            title: {
+            preset_name: {
+                en: 'Empty',
+                poj: 'Khang--ê'
+            },
+            page_title: {
                 en: '',
                 poj: ''
             },
@@ -31,7 +35,11 @@
 
         // Default practice text
         'default': {
-            title: {
+            preset_name: {
+                en: 'Default',
+                poj: 'Chiàu-goân'
+            },
+            page_title: {
                 en: 'POJ Handwriting Practice',
                 poj: 'Liān-si̍p Siá Pe̍h-ōe-jī'
             },
@@ -46,7 +54,11 @@
 
         // Vowel practice: A, I, U, O͘, E, O
         'vowels': {
-            title: {
+            preset_name: {
+                en: 'Vowels (A, I, U, O͘, E, O)',
+                poj: 'Bó-im (A, I, U, O͘, E, O)'
+            },
+            page_title: {
                 en: 'POJ Vowels Practice',
                 poj: 'Liān-si̍p Siá Pe̍h-ōe-jī Bó-im'
             },
@@ -69,7 +81,11 @@ A-î ū o͘-ê--bô?  A-î ū o͘-ê--bô?`,
 
         // Consonant practice: P, Ph, M, B, T, Th, N, L, K, Kh, Ng, G, H, Ch, Chh, S, J
         'consonants': {
-            title: {
+            preset_name: {
+                en: 'Consonants (P, Ph, M, B...)',
+                poj: 'Chú-im (P, Ph, M, B...)'
+            },
+            page_title: {
                 en: 'POJ Consonants Practice',
                 poj: 'Liān-si̍p Siá Pe̍h-ōe-jī Chú-im'
             },
@@ -101,7 +117,11 @@ A-pô tì bō-á.  Gô-á mo͘ n̂g-n̂g.`,
 
         // Tone marks practice: All 8 tones for each vowel
         'tones': {
-            title: {
+            preset_name: {
+                en: 'Tone Marks (A, Á, À, Ah...)',
+                poj: 'Siaⁿ-tiāu (A, Á, À, Ah...)'
+            },
+            page_title: {
                 en: 'POJ Tone Marks Practice',
                 poj: 'Liān-si̍p Siá Pe̍h-ōe-jī Siaⁿ-tiāu'
             },
@@ -123,6 +143,67 @@ m   ḿ   m̀   mh   m̂   m̄   m̍h   m̆
 Ng Ńg Ǹg Ngh  N̂g N̄g N̍gh N̆g
 ng  ńg  ǹg  ngh  n̂g  n̄g  n̍gh  n̆g
 Chăng góa ū chia̍h jĭn-jín.`,
+            font: 'Lesson One',
+            lineHeight: 26,
+            guideStyle: 'normal',
+            textStyle: 'grey',
+            practiceMode: 'tracing',
+            followingLines: 'fill'
+        },
+
+        // Nasal vowels practice: Aⁿ, Iⁿ, Oⁿ, Eⁿ
+        'nasals': {
+            preset_name: {
+                en: 'Nasal Vowels (Aⁿ, Iⁿ, Oⁿ...)',
+                poj: 'Phīⁿ-im Hòa Bó-im Jī-bóe (Aⁿ, Iⁿ, Oⁿ...)'
+            },
+            page_title: {
+                en: 'POJ Nasal Vowels Practice',
+                poj: 'Phīⁿ-im Hòa Ko͘ Bó-im Jī-bóe'
+            },
+            text: `Aⁿ  Aⁿ  Aⁿ  Aⁿ  Aⁿ  Aⁿ  Aⁿ  Aⁿ
+aⁿ  aⁿ  aⁿ  aⁿ  aⁿ  aⁿ  aⁿ  aⁿ  aⁿ
+Iⁿ  Iⁿ  Iⁿ  Iⁿ  Iⁿ  Iⁿ  Iⁿ  Iⁿ  Iⁿ
+iⁿ  iⁿ  iⁿ  iⁿ  iⁿ  iⁿ  iⁿ  iⁿ  iⁿ  iⁿ  iⁿ
+Oⁿ  Oⁿ  Oⁿ  Oⁿ  Oⁿ  Oⁿ  Oⁿ  Oⁿ
+oⁿ  oⁿ  oⁿ  oⁿ  oⁿ  oⁿ  oⁿ  oⁿ  oⁿ
+Eⁿ  Eⁿ  Eⁿ  Eⁿ  Eⁿ  Eⁿ  Eⁿ  Eⁿ  Eⁿ
+eⁿ  eⁿ  eⁿ  eⁿ  eⁿ  eⁿ  eⁿ  eⁿ  eⁿ`,
+            font: 'Lesson One',
+            lineHeight: 26,
+            guideStyle: 'normal',
+            textStyle: 'grey',
+            practiceMode: 'tracing',
+            followingLines: 'fill'
+        },
+
+        // Nasal compound vowels practice: Aiⁿ, Auⁿ, Iaⁿ, Iuⁿ, Oaⁿ
+        'nasal_compounds': {
+            preset_name: {
+                en: 'Nasal Diphthongs (Aiⁿ, Auⁿ, Iaⁿ, Iuⁿ...)',
+                poj: 'Phīⁿ-im Hòa Ho̍k Bó-im Jī-bóe (Aiⁿ, Auⁿ, Iaⁿ, Iuⁿ...)'
+            },
+            page_title: {
+                en: 'POJ Nasal Diphthongs Practice',
+                poj: 'Phīⁿ-im Hòa Ho̍k Bó-im Jī-bóe'
+            },
+            text: `Aiⁿ  Aiⁿ  Aiⁿ  Aiⁿ  Aiⁿ  Aiⁿ  Aiⁿ
+aiⁿ  aiⁿ  aiⁿ  aiⁿ  aiⁿ  aiⁿ  aiⁿ
+Auⁿ  Auⁿ  Auⁿ  Auⁿ  Auⁿ  Auⁿ
+auⁿ  auⁿ  auⁿ  auⁿ  auⁿ  auⁿ
+Iaⁿ  Iaⁿ  Iaⁿ  Iaⁿ  Iaⁿ  Iaⁿ  Iaⁿ
+iaⁿ  iaⁿ  iaⁿ  iaⁿ  iaⁿ  iaⁿ  iaⁿ
+Iuⁿ  Iuⁿ  Iuⁿ  Iuⁿ  Iuⁿ  Iuⁿ  Iuⁿ
+iuⁿ  iuⁿ  iuⁿ  iuⁿ  iuⁿ  iuⁿ  iuⁿ
+
+Iauⁿ  Iauⁿ  Iauⁿ  Iauⁿ  Iauⁿ
+iauⁿ  iauⁿ  iauⁿ  iauⁿ  iauⁿ  iauⁿ
+Uiⁿ  Uiⁿ  Uiⁿ  Uiⁿ  Uiⁿ  Uiⁿ  Uiⁿ
+uiⁿ  uiⁿ  uiⁿ  uiⁿ  uiⁿ  uiⁿ  uiⁿ
+Oaⁿ  Oaⁿ  Oaⁿ  Oaⁿ  Oaⁿ  Oaⁿ
+oaⁿ  oaⁿ  oaⁿ  oaⁿ  oaⁿ  oaⁿ
+Oaiⁿ  Oaiⁿ  Oaiⁿ  Oaiⁿ  Oaiⁿ
+oaiⁿ  oaiⁿ  oaiⁿ  oaiⁿ  oaiⁿ  oaiⁿ`,
             font: 'Lesson One',
             lineHeight: 26,
             guideStyle: 'normal',

@@ -99,7 +99,17 @@ window.App.UI.Premade = (function () {
 
         const description = item.description[lang] || item.description.poj;
 
-        const formattedDate = new Date(item.date).toLocaleDateString();
+        const dateObj = new Date(item.date);
+        let formattedDate;
+
+        if (lang === 'poj') {
+            const year = dateObj.getFullYear();
+            const month = String(dateObj.getMonth() + 1).padStart(2, '0');
+            const day = String(dateObj.getDate()).padStart(2, '0');
+            formattedDate = `${year}/${month}/${day}`;
+        } else {
+            formattedDate = dateObj.toLocaleDateString();
+        }
 
         card.innerHTML = `
             <div class="card-image">

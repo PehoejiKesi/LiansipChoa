@@ -16,11 +16,7 @@
             textSettings: "Text Settings",
             pageTitle: "Page Title:",
             preset: "Preset:",
-            presetEmpty: "Empty",
-            presetDefault: "Default",
-            presetVowels: "Vowels (A, I, U, O͘, E, O)",
-            presetConsonants: "Consonants (P, Ph, M, B...)",
-            presetTones: "Tone Marks (A, Á, À, Ah...)",
+            preset: "Preset:",
             pageTitlePlaceholder: "e.g., Handwriting Practice",
             textToPractice: "Text to Practice:",
             textPlaceholder: "Enter text to practice...",
@@ -75,6 +71,7 @@
             tagTones: "Tones",
             tagBeginner: "Beginner",
             tagAlphabet: "Alphabet",
+            tagNasal: "Nasal",
 
             // Preview
             preview: "Preview"
@@ -90,11 +87,7 @@
             textSettings: "Beh Siá Siáⁿ",
             pageTitle: "Phiau-tê (Ē-sái bián):",
             preset: "Kiàn-pún:",
-            presetEmpty: "Khang--ê",
-            presetDefault: "Chiàu-goân",
-            presetVowels: "Bó-im (A, I, U, O͘, E, O)",
-            presetConsonants: "Chú-im (P, Ph, M, B...)",
-            presetTones: "Siaⁿ-tiāu (A, Á, À, Ah...)",
+            preset: "Kiàn-pún:",
             pageTitlePlaceholder: "Lē: \"Liān-si̍p Siá Pe̍h-ōe-jī\"",
             textToPractice: "Beh Liān-si̍p Siá Siáⁿ:",
             textPlaceholder: "Tī chia phah jī...",
@@ -149,6 +142,7 @@
             tagTones: "Siaⁿ-tiāu",
             tagBeginner: "Chho͘-ha̍k-chiá",
             tagAlphabet: "Jī-bó",
+            tagNasal: "Phīⁿ-im",
 
             // Preview
             preview: "Ē Seⁿ Chò Án-ne"

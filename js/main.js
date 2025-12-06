@@ -100,7 +100,23 @@ document.addEventListener('DOMContentLoaded', () => {
                 const currentPreset = ui.presetSelect.value;
                 if (currentPreset !== 'custom' && Presets && Presets[currentPreset]) {
                     const lang = e.target.value;
-                    ui.pageTitle.value = Presets[currentPreset].title[lang] || Presets[currentPreset].title.poj;
+                    ui.pageTitle.value = Presets[currentPreset].page_title[lang] || Presets[currentPreset].page_title.poj;
+                }
+
+                // Re-populate preset dropdown options to show correct language
+                if (Presets) {
+                    const selectedValue = ui.presetSelect.value;
+                    ui.presetSelect.innerHTML = '';
+                    for (const [key, preset] of Object.entries(Presets)) {
+                        const option = document.createElement('option');
+                        option.value = key;
+                        const lang = e.target.value;
+                        // Use name for dropdown option, fall back to title if name missing
+                        const nameObj = preset.preset_name || preset.page_title;
+                        option.textContent = nameObj[lang] || nameObj.poj;
+                        ui.presetSelect.appendChild(option);
+                    }
+                    ui.presetSelect.value = selectedValue;
                 }
 
                 // Re-render premade section with new language
@@ -124,27 +140,18 @@ document.addEventListener('DOMContentLoaded', () => {
         ui.presetSelect.innerHTML = '';
         // Add an empty placeholder if needed, or just start with the first preset
 
-        // Map preset keys to translation keys
-        const presetTranslationKeys = {
-            'empty': 'presetEmpty',
-            'default': 'presetDefault',
-            'vowels': 'presetVowels',
-            'consonants': 'presetConsonants',
-            'tones': 'presetTones'
-        };
-
-        const t = window.App.Data.t;
+        // Create options from Presets object
+        // No translation keys needed as titles are self-contained in presets.js
 
         for (const [key, preset] of Object.entries(Presets)) {
             const option = document.createElement('option');
             option.value = key;
-            // Use translation key if available, otherwise fall back to preset title
-            const translationKey = presetTranslationKeys[key];
-            option.textContent = translationKey ? t(translationKey) : (preset.title[window.App.Data.currentLanguage] || preset.title.poj);
-            option.setAttribute('data-i18n', translationKey || '');
+            const currentLang = window.App.Data.currentLanguage || 'poj';
+            // Use name for dropdown option, fall back to title if name missing
+            const nameObj = preset.preset_name || preset.page_title;
+            option.textContent = nameObj[currentLang] || nameObj.poj;
             ui.presetSelect.appendChild(option);
         }
-
         // Set default selection
         ui.presetSelect.value = 'default';
 
@@ -159,7 +166,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (ui.followingLines && preset.followingLines) ui.followingLines.value = preset.followingLines;
 
                 const lang = window.App.Data.currentLanguage || 'poj';
-                if (ui.pageTitle) ui.pageTitle.value = preset.title[lang] || preset.title.poj;
+                if (ui.pageTitle) ui.pageTitle.value = preset.page_title[lang] || preset.page_title.poj;
                 if (ui.inputText) ui.inputText.value = preset.text;
 
                 updatePreview(ui);

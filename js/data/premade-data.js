@@ -1,7 +1,3 @@
-/**
- * Premade Data
- * Centralized data structure for premade items
- */
 
 /**
  * Premade Data
@@ -13,39 +9,61 @@
             id: 'vowels',
             date: '2025-12-06',
             tags: ['vowels', 'beginner', 'alphabet'],
-            image: 'assets/premade/preview/POJ_LiansipChoa_Vowels.png',
+            image: 'assets/premade/preview/POJ_LiansipChoa_Vowels.jpg',
             pdfUrl: 'assets/premade/POJ_LiansipChoa_Vowels.pdf',
             description: {
-                en: 'Vowels: a, i, u, o͘, e, o',
-                poj: 'Bó-im: a, i, u, o͘, e, o'
+                en: 'a, i, u, o͘, e, o',
+                poj: 'a, i, u, o͘, e, o'
             }
         },
         {
             id: 'consonants',
             date: '2025-12-06',
             tags: ['consonants', 'beginner', 'alphabet'],
-            image: 'assets/premade/preview/POJ_LiansipChoa_Consonants.png',
+            image: 'assets/premade/preview/POJ_LiansipChoa_Consonants.jpg',
             pdfUrl: 'assets/premade/POJ_LiansipChoa_Consonants.pdf',
             description: {
-                en: 'Consonants: p, ph, m, b...',
-                poj: 'Chú-im: p, ph, m, b...'
+                en: 'p, ph, m, b...',
+                poj: 'p, ph, m, b...'
             }
         },
         {
             id: 'tones',
             date: '2025-12-06',
             tags: ['tones', 'beginner'],
-            image: 'assets/premade/preview/POJ_LiansipChoa_Tones.png',
+            image: 'assets/premade/preview/POJ_LiansipChoa_Tones.jpg',
             pdfUrl: 'assets/premade/POJ_LiansipChoa_Tones.pdf',
             description: {
-                en: 'Tones: 8 tones',
-                poj: '8 Siaⁿ-tiāu'
+                en: '8 tones',
+                poj: '8 siaⁿ-tiāu'
+            }
+        },
+        {
+            id: 'nasal_vowels',
+            date: '2025-12-06',
+            tags: ['nasal', 'vowels', 'beginner'],
+            image: 'assets/premade/preview/POJ_LiansipChoa_NasalVowels.jpg',
+            pdfUrl: 'assets/premade/POJ_LiansipChoa_NasalVowels.pdf',
+            description: {
+                en: 'aⁿ, iⁿ, oⁿ, eⁿ',
+                poj: 'aⁿ, iⁿ, oⁿ, eⁿ'
+            }
+        },
+        {
+            id: 'nasal_diphthongs',
+            date: '2025-12-06',
+            tags: ['nasal', 'beginner'],
+            image: 'assets/premade/preview/POJ_LiansipChoa_NasalDiphthongs.jpg',
+            pdfUrl: 'assets/premade/POJ_LiansipChoa_NasalDiphthongs.pdf',
+            description: {
+                en: 'aiⁿ, auⁿ, iaⁿ, iuⁿ...',
+                poj: 'aiⁿ, auⁿ, iaⁿ, iuⁿ...'
             }
         }
     ];
 
     // Define tag order: categories first, then difficulty
-    const TAG_ORDER = ['alphabet', 'vowels', 'consonants', 'tones', 'beginner'];
+    const TAG_ORDER = ['alphabet', 'vowels', 'nasal', 'consonants', 'tones', 'beginner'];
 
     /**
      * Get all unique tags from premade data in defined order
