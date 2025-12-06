@@ -66,12 +66,6 @@
             tabPremade: "Premade",
 
             // Premade Section
-            premadeVowelsTitle: "Vowels",
-            premadeVowelsDesc: "a, i, u, o͘, e, o",
-            premadeTonesTitle: "Tones",
-            premadeTonesDesc: "8 tones",
-            premadeConsonantsTitle: "Consonants",
-            premadeConsonantsDesc: "p, ph, m, b, etc.",
             premadeButton: "Download PDF",
 
             // Tags
@@ -146,12 +140,6 @@
             tabPremade: "Lia̍h Chò Hó--ê",
 
             // Premade Section
-            premadeVowelsTitle: "Bó-im",
-            premadeVowelsDesc: "a, i, u, o͘, e, o",
-            premadeTonesTitle: "Siaⁿ-tiāu",
-            premadeTonesDesc: "8 siaⁿ-tiāu",
-            premadeConsonantsTitle: "Chú-im",
-            premadeConsonantsDesc: "p, ph, m, b...",
             premadeButton: "Táng-ló͘ PDF",
 
             // Tags
