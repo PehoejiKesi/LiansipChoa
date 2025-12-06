@@ -302,15 +302,44 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
 
-        // Check URL on initial load
-        const initialPath = window.location.pathname;
-        let initialTab = 'generator';
-        if (initialPath.endsWith('/liah')) {
-            initialTab = 'premade';
-        }
-        // Only switch if we need to show premade, otherwise default is fine (HTML is active on generator)
-        if (initialTab !== 'generator') {
-            switchToTab(initialTab, false);
+        // Check for redirect from 404.html
+        const redirect = new URLSearchParams(window.location.search).get('redirect');
+        if (redirect) {
+            // Restore the URL
+            const targetUrl = window.location.origin + window.location.pathname.slice(0, -1) + redirect; // clean up trailing slash on pathname if needed, though basePath handles some
+            // Let's rely on constructing the path carefully.
+            // If we are at /LiansipChoa/ and redirect is /LiansipChoa/liah
+            // The 404 script logic: l.pathname.split('/').slice(0, 1 + pathSegmentsToKeep).join('/') + '/?redirect='
+            // So if pathSegmentsToKeep is 1, and we are at /LiansipChoa/liah, it redirects to /LiansipChoa/?redirect=liah
+            // Wait, let's re-verify the 404 script I wrote.
+            // var pathSegmentsToKeep = 1;
+            // l.pathname.split('/').slice(0, 1 + pathSegmentsToKeep).join('/') usually results in /RepoName
+            // So redirects to /RepoName/?redirect=...
+            // So if redirect param is present:
+
+            const decodedRedirect = redirect.replace(/~and~/g, '&');
+            const targetPath = basePath + '/' + decodedRedirect;
+
+            // Update history immediately to show correct URL
+            history.replaceState(null, null, targetPath);
+
+            // Now determine tab based on the restored path
+            if (decodedRedirect === 'liah' || decodedRedirect.endsWith('/liah')) {
+                switchToTab('premade', false);
+            } else {
+                switchToTab('generator', false);
+            }
+        } else {
+            // Check URL on initial load (creates normal behavior)
+            const initialPath = window.location.pathname;
+            let initialTab = 'generator';
+            if (initialPath.endsWith('/liah')) {
+                initialTab = 'premade';
+            }
+            // Only switch if we need to show premade, otherwise default is fine (HTML is active on generator)
+            if (initialTab !== 'generator') {
+                switchToTab(initialTab, false);
+            }
         }
     }
 
