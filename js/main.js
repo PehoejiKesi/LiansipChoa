@@ -68,7 +68,7 @@ document.addEventListener('DOMContentLoaded', () => {
             followingLines: document.getElementById('followingLines'),
             guideStyle: document.getElementById('guideStyle'),
             textStyle: document.getElementById('textStyle'),
-            languageSelect: document.getElementById('languageSelect'),
+            languageButtons: document.querySelectorAll('.lang-btn'),
             presetSelect: document.getElementById('presetSelect'),
             clearTitleBtn: document.getElementById('clearTitleBtn'),
             clearTextBtn: document.getElementById('clearTextBtn')
@@ -81,50 +81,66 @@ document.addEventListener('DOMContentLoaded', () => {
         const currentLanguage = window.App.Data.currentLanguage;
         const updateUILanguage = window.App.Data.updateUILanguage;
 
-        if (ui.languageSelect && currentLanguage) {
-            ui.languageSelect.value = currentLanguage;
+        const updateActiveButton = (lang) => {
+            if (ui.languageButtons) {
+                ui.languageButtons.forEach(btn => {
+                    if (btn.dataset.lang === lang) {
+                        btn.classList.add('active');
+                    } else {
+                        btn.classList.remove('active');
+                    }
+                });
+            }
+        };
+
+        if (currentLanguage) {
+            updateActiveButton(currentLanguage);
         }
 
         if (updateUILanguage) {
             updateUILanguage();
         }
 
-        if (ui.languageSelect) {
-            ui.languageSelect.addEventListener('change', (e) => {
-                if (window.App.Data.switchLanguage) {
-                    window.App.Data.switchLanguage(e.target.value);
-                }
+        if (ui.languageButtons) {
+            ui.languageButtons.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const lang = btn.dataset.lang;
 
-                // Update preset title if a preset is selected
-                const Presets = window.App.Data.Presets;
-                const currentPreset = ui.presetSelect.value;
-                if (currentPreset !== 'custom' && Presets && Presets[currentPreset]) {
-                    const lang = e.target.value;
-                    ui.pageTitle.value = Presets[currentPreset].page_title[lang] || Presets[currentPreset].page_title.poj;
-                }
-
-                // Re-populate preset dropdown options to show correct language
-                if (Presets) {
-                    const selectedValue = ui.presetSelect.value;
-                    ui.presetSelect.innerHTML = '';
-                    for (const [key, preset] of Object.entries(Presets)) {
-                        const option = document.createElement('option');
-                        option.value = key;
-                        const lang = e.target.value;
-                        // Use name for dropdown option, fall back to title if name missing
-                        const nameObj = preset.preset_name || preset.page_title;
-                        option.textContent = nameObj[lang] || nameObj.poj;
-                        ui.presetSelect.appendChild(option);
+                    if (window.App.Data.switchLanguage) {
+                        window.App.Data.switchLanguage(lang);
                     }
-                    ui.presetSelect.value = selectedValue;
-                }
 
-                // Re-render premade section with new language
-                if (window.App.UI && window.App.UI.Premade && window.App.UI.Premade.init) {
-                    window.App.UI.Premade.init();
-                }
+                    updateActiveButton(lang);
 
-                updatePreview(ui);
+                    // Update preset title if a preset is selected
+                    const Presets = window.App.Data.Presets;
+                    const currentPreset = ui.presetSelect.value;
+                    if (currentPreset !== 'custom' && Presets && Presets[currentPreset]) {
+                        ui.pageTitle.value = Presets[currentPreset].page_title[lang] || Presets[currentPreset].page_title.poj;
+                    }
+
+                    // Re-populate preset dropdown options to show correct language
+                    if (Presets) {
+                        const selectedValue = ui.presetSelect.value;
+                        ui.presetSelect.innerHTML = '';
+                        for (const [key, preset] of Object.entries(Presets)) {
+                            const option = document.createElement('option');
+                            option.value = key;
+                            // Use name for dropdown option, fall back to title if name missing
+                            const nameObj = preset.preset_name || preset.page_title;
+                            option.textContent = nameObj[lang] || nameObj.poj;
+                            ui.presetSelect.appendChild(option);
+                        }
+                        ui.presetSelect.value = selectedValue;
+                    }
+
+                    // Re-render premade section with new language
+                    if (window.App.UI && window.App.UI.Premade && window.App.UI.Premade.init) {
+                        window.App.UI.Premade.init();
+                    }
+
+                    updatePreview(ui);
+                });
             });
         }
     }

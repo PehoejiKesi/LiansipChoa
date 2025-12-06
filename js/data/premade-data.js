@@ -87,6 +87,7 @@
 
     window.App.Data.Premade = {
         items: PREMADE_DATA,
-        getAllTags: getAllTags
+        getAllTags: getAllTags,
+        tagOrder: TAG_ORDER
     };
 })();

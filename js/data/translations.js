@@ -59,7 +59,7 @@
 
             // Tabs
             tabGenerator: "Generator",
-            tabPremade: "Premade",
+            tabPremade: "Pre-made",
 
             // Premade Section
             premadeButton: "Download PDF",

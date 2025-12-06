@@ -118,7 +118,15 @@ window.App.UI.Premade = (function () {
             <div class="card-content">
                 <p>${description}</p>
                 <div class="card-tags">
-                    ${item.tags.map(tag => `<span class="hashtag">#${getTagTranslation(tag)}</span>`).join('')}
+                    ${item.tags.slice().sort((a, b) => {
+            const tagOrder = window.App.Data.Premade.tagOrder || [];
+            const indexA = tagOrder.indexOf(a);
+            const indexB = tagOrder.indexOf(b);
+            if (indexA === -1 && indexB === -1) return a.localeCompare(b);
+            if (indexA === -1) return 1;
+            if (indexB === -1) return -1;
+            return indexA - indexB;
+        }).map(tag => `<span class="hashtag">#${getTagTranslation(tag)}</span>`).join('')}
                 </div>
                 <div class="card-date">${formattedDate}</div>
                 <a href="${item.pdfUrl}" class="premade-btn" target="_blank">
