@@ -33,7 +33,7 @@
             // Handwriting Settings
             handwritingSettings: "Handwriting Settings",
             font: "Font:",
-            presetNasalCodas: "Nasal Codas (Am, An, Ang...)",
+
             fontIansui: "Iansui",
             fontOpenHuninn: "Open Huninn",
             fontChiayiCity: "Chiayi City",
@@ -75,6 +75,10 @@
             tagBeginner: "Beginner",
             tagAlphabet: "Alphabet",
             tagNasal: "Nasal",
+            tagInitials: "Initials",
+            tagA4: "A4",
+            tagStop: "Stop",
+            tagCodas: "Codas",
 
             // Preview
             preview: "Preview"
@@ -107,7 +111,7 @@
             // Handwriting Settings
             handwritingSettings: "Keh-sek Siáⁿ Khoán",
             font: "Jī-thé:",
-            presetNasalCodas: "Phīⁿ Chú-im Bóe-liu Jī-bóe (Am, An, Ang...)",
+
             fontIansui: "Iansui",
             fontOpenHuninn: "Open Huninn",
             fontChiayiCity: "Chiayi City",
@@ -149,6 +153,10 @@
             tagBeginner: "Chho͘-ha̍k-chiá",
             tagAlphabet: "Jī-bó",
             tagNasal: "Phīⁿ-im",
+            tagInitials: "Jī-thâu",
+            tagA4: "A4",
+            tagStop: "Sok-im",
+            tagCodas: "Jī-bóe",
 
             // Preview
             preview: "Ē Seⁿ Chò Án-ne"

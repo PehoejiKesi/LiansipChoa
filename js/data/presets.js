@@ -215,8 +215,8 @@ oaiⁿ  oaiⁿ  oaiⁿ  oaiⁿ  oaiⁿ  oaiⁿ`,
         // Nasal codas practice: Am, An, Ang, Im, In...
         'nasal_codas': {
             preset_name: {
-                en: 'Nasal Codas (Am, An, Ang...)',
-                poj: 'Phīⁿ Chú-im Bóe-liu Jī-bóe (Am, An, Ang...)'
+                en: 'Nasal Codas (-m, -n, -ng)',
+                poj: 'Phīⁿ Chú-im Bóe-liu Jī-bóe (-m, -n, -ng)'
             },
             page_title: {
                 en: 'POJ Nasal Codas',
@@ -237,6 +237,75 @@ Oan Oan Oan  oan oan oan
 Oang Oang  oang oang oang 
 Ian Ian Ian  ian ian ian ian
 Eng Eng Eng  eng eng eng eng`,
+            font: 'Lesson One',
+            lineHeight: 26,
+            guideStyle: 'normal',
+            textStyle: 'grey',
+            practiceMode: 'tracing',
+            followingLines: 'fill'
+        },
+
+        // Stop codas practice: ap, at, ak, ah, ip, it...
+        'basic_stop_codas': {
+            preset_name: {
+                en: 'Basic Stop Codas (ap, at, ak, ah, ip, it...)',
+                poj: 'Ki-pún Sok-im Jī-bóe (ap, at, ak, ah, ip, it...)'
+            },
+            page_title: {
+                en: 'Basic Stop Codas',
+                poj: 'Ki-pún Sok-im Jī-bóe'
+            },
+            text: `Ap Ap Ap Ap  ap ap ap ap ap
+At At At At At  at at at at at
+Ak Ak Ak Ak Ak  ak ak ak ak ak
+Ah Ah Ah Ah  ah ah ah ah ah
+Ip Ip Ip Ip Ip  ip ip ip ip ip ip
+It It It It It It  it it it it it it it
+Ih Ih Ih Ih Ih  ih ih ih ih ih ih
+
+
+Ut Ut Ut Ut Ut  ut ut ut ut ut
+Uh Uh Uh Uh Uh  uh uh uh uh
+Op Op Op Op  op op op op op
+Ok Ok Ok Ok  ok ok ok ok ok
+O͘h O͘h O͘h O͘h  o͘h o͘h o͘h o͘h o͘h
+Eh Eh Eh Eh Eh  eh eh eh eh eh
+Oh Oh Oh Oh  oh oh oh oh oh`,
+            font: 'Lesson One',
+            lineHeight: 26,
+            guideStyle: 'normal',
+            textStyle: 'grey',
+            practiceMode: 'tracing',
+            followingLines: 'fill'
+        },
+
+        // PTK stop codas practice
+        'ptk_stop_codas': {
+            preset_name: {
+                en: 'PTK Stop Codas (Ap, At, Ak, Ip, It...)',
+                poj: 'PTK Sok-im Jī-bóe (Ap, At, Ak, Ip, It...)'
+            },
+            page_title: {
+                en: 'PTK Stop Codas',
+                poj: 'PTK Sok-im Jī-bóe'
+            },
+            text: `Ap Ap Ap Ap  ap ap ap ap ap
+At At At At At  at at at at at
+Ak Ak Ak Ak Ak  ak ak ak ak ak
+Ip Ip Ip Ip Ip  ip ip ip ip ip ip
+It It It It It It  it it it it it it it
+Iap Iap Iap  iap iap iap iap
+Iak Iak Iak Iak  iak iak iak iak
+Iok Iok Iok Iok  iok iok iok iok
+
+Ut Ut Ut Ut Ut  ut ut ut ut ut
+Op Op Op Op  op op op op op
+Ok Ok Ok Ok  ok ok ok ok ok
+Oat Oat Oat  oat oat oat oat
+Oak Oak Oak  oak oak oak oak
+
+Iat Iat Iat Iat  iat iat iat iat
+Ek Ek Ek Ek Ek  ek ek ek ek ek`,
             font: 'Lesson One',
             lineHeight: 26,
             guideStyle: 'normal',

@@ -251,6 +251,12 @@ document.addEventListener('DOMContentLoaded', () => {
             if (path.endsWith('/liah')) {
                 return path.slice(0, -5);
             }
+            if (path.endsWith('/liah/')) {
+                return path.slice(0, -6);
+            }
+            if (path.endsWith('/liah/index.html')) {
+                return path.slice(0, -16);
+            }
             // If path ends with /index.html, strip it
             if (path.endsWith('/index.html')) {
                 return path.slice(0, -11);
@@ -356,7 +362,7 @@ document.addEventListener('DOMContentLoaded', () => {
             // Check URL on initial load (creates normal behavior)
             const initialPath = window.location.pathname;
             let initialTab = 'generator';
-            if (initialPath.endsWith('/liah')) {
+            if (initialPath.endsWith('/liah') || initialPath.endsWith('/liah/') || initialPath.endsWith('/liah/index.html')) {
                 initialTab = 'premade';
             }
             // Only switch if we need to show premade, otherwise default is fine (HTML is active on generator)

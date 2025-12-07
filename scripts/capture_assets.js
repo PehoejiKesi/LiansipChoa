@@ -6,7 +6,7 @@ const path = require('path');
 // Configuration
 const PORT = 8081;
 const ROOT_DIR = path.resolve(__dirname, '..');
-const OUTPUT_DIR = path.join(ROOT_DIR, 'assets', 'premade');
+const OUTPUT_DIR = path.join(ROOT_DIR, 'assets', 'pre_made');
 const PREVIEW_DIR = path.join(OUTPUT_DIR, 'preview');
 
 // Mappings: Preset Key in dropdown -> Output Filename Base
@@ -16,7 +16,9 @@ const PRESETS = {
     'tones': 'POJ_LiansipChoa_Sianntiau',
     'nasals': 'POJ_LiansipChoa_PhinnimHoaKooBoimJiboe',
     'nasal_compounds': 'POJ_LiansipChoa_PhinnimHoaHokBoimJiboe',
-    'nasal_codas': 'POJ_LiansipChoa_PhinnChuimBoeliuJiboe'
+    'nasal_codas': 'POJ_LiansipChoa_PhinnChuimBoeliuJiboe',
+    'basic_stop_codas': 'POJ_LiansipChoa_KipunSokimJiboe',
+    'ptk_stop_codas': 'POJ_LiansipChoa_PTKSokimJiboe'
 };
 
 // Ensure directories exist
