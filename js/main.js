@@ -352,7 +352,9 @@ document.addEventListener('DOMContentLoaded', () => {
             history.replaceState(null, null, targetPath);
 
             // Now determine tab based on the restored path
-            if (decodedRedirect === 'liah' || decodedRedirect.endsWith('/liah')) {
+            const normalizedRedirect = decodedRedirect.endsWith('/') ? decodedRedirect.slice(0, -1) : decodedRedirect;
+
+            if (normalizedRedirect === 'liah' || normalizedRedirect.endsWith('/liah')) {
                 switchToTab('premade', false);
             } else {
                 switchToTab('generator', false);
