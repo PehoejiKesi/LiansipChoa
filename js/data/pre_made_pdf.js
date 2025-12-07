@@ -92,11 +92,33 @@
                 en: 'ap, at, ak, ip, it...',
                 poj: 'ap, at, ak, ip, it...'
             }
-        }
+        },
+        {
+            id: 'kinajit_paikui',
+            date: '2025-12-07',
+            tags: ['words', 'A4'],
+            image: 'assets/pre_made/preview/POJ_LiansipChoa_KinajitPaiKui.jpg',
+            pdfUrl: 'assets/pre_made/POJ_LiansipChoa_KinajitPaiKui.pdf',
+            description: {
+                en: "Days of the week",
+                poj: 'pài-it, pài-jī, pài-saⁿ...'
+            }
+        },
+        {
+            id: 'tones_mnemonic',
+            date: '2025-12-07',
+            tags: ['tones', 'words', 'beginner', 'A4'],
+            image: 'assets/pre_made/preview/POJ_LiansipChoa_8SianntiauKhaukoat.jpg',
+            pdfUrl: 'assets/pre_made/POJ_LiansipChoa_8SianntiauKhaukoat.pdf',
+            description: {
+                en: "8 tones mnemonic",
+                poj: '8 siaⁿ-tiāu kháu-koat'
+            }
+        },
     ];
 
     // Define tag order: categories first, then difficulty
-    const TAG_ORDER = ['alphabet', 'vowels', 'consonants', 'nasal', 'stop', 'initials', 'codas', 'tones', 'beginner', 'A4'];
+    const TAG_ORDER = ['alphabet', 'vowels', 'consonants', 'nasal', 'stop', 'initials', 'codas', 'tones', 'words', 'beginner', 'A4'];
 
     /**
      * Get all unique tags from premade data in defined order

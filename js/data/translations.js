@@ -79,6 +79,8 @@
             tagA4: "A4",
             tagStop: "Stop",
             tagCodas: "Codas",
+            tagCodas: "Codas",
+            tagWords: "Words",
 
             // Preview
             preview: "Preview"
@@ -156,7 +158,10 @@
             tagInitials: "Jī-thâu",
             tagA4: "A4",
             tagStop: "Sok-im",
+            tagStop: "Sok-im",
             tagCodas: "Jī-bóe",
+            tagCodas: "Jī-bóe",
+            tagWords: "Gí-sû",
 
             // Preview
             preview: "Ē Seⁿ Chò Án-ne"
