@@ -26,10 +26,7 @@
                 en: 'Empty',
                 poj: 'Khang--ê'
             },
-            page_title: {
-                en: '',
-                poj: ''
-            },
+            page_title: '',
             text: ``
         },
 
@@ -39,10 +36,7 @@
                 en: 'Default',
                 poj: 'Chiàu-goân'
             },
-            page_title: {
-                en: 'POJ Handwriting Practice',
-                poj: 'Liān-si̍p Siá Pe̍h-ōe-jī'
-            },
+            page_title: 'Liān-si̍p Siá Pe̍h-ōe-jī',
             text: `Góa chiok kah-ì siá Pe̍h-ōe-jī.`,
             font: 'Lesson One',
             lineHeight: 26,
@@ -58,10 +52,7 @@
                 en: 'Vowels (A, I, U, O͘, E, O)',
                 poj: 'Bó-im (A, I, U, O͘, E, O)'
             },
-            page_title: {
-                en: 'POJ Vowels',
-                poj: 'Pe̍h-ōe-jī Bó-im'
-            },
+            page_title: 'Pe̍h-ōe-jī Bó-im',
             text: `A A A A A A A   a a a a a a a a
 I  I  I  I  I  I  I   i  i  i  i  i  i  i  i
 U U U U U U U   u u u u u u u u
@@ -85,10 +76,7 @@ A-î ū o͘-ê--bô?  A-î ū o͘-ê--bô?`,
                 en: 'Consonants (P, Ph, M, B...)',
                 poj: 'Chú-im (P, Ph, M, B...)'
             },
-            page_title: {
-                en: 'POJ Consonants',
-                poj: 'Pe̍h-ōe-jī Chú-im'
-            },
+            page_title: 'Pe̍h-ōe-jī Chú-im',
             text: `P P P P P P P   p  p  p  p  p  p  p
 Ph Ph Ph Ph   ph ph ph ph ph
 M M M M M   m  m  m  m  m  m
@@ -121,10 +109,7 @@ A-pô tì bō-á.  Gô-á mo͘ n̂g-n̂g.`,
                 en: 'Tone Marks (A, Á, À, Ah...)',
                 poj: 'Siaⁿ-tiāu (A, Á, À, Ah...)'
             },
-            page_title: {
-                en: 'POJ Tone Marks',
-                poj: 'Pe̍h-ōe-jī Siaⁿ-tiāu'
-            },
+            page_title: 'Pe̍h-ōe-jī Siaⁿ-tiāu',
             text: `A   Á   À   Ah     Â   Ā   A̍h   Ă
 a   á    à   ah      â   ā    a̍h   ă
 I    Í    Ì   Ih      Î    Ī    I̍h   Ĭ
@@ -157,10 +142,7 @@ Chăng góa ū chia̍h jĭn-jín.`,
                 en: 'Nasal Vowels (Aⁿ, Iⁿ, Oⁿ...)',
                 poj: 'Phīⁿ-im Hòa Bó-im Jī-bóe (Aⁿ, Iⁿ, Oⁿ...)'
             },
-            page_title: {
-                en: 'POJ Nasal Vowels',
-                poj: 'Phīⁿ-im Hòa Ko͘ Bó-im Jī-bóe'
-            },
+            page_title: 'Phīⁿ-im Hòa Ko͘ Bó-im Jī-bóe',
             text: `Aⁿ  Aⁿ  Aⁿ  Aⁿ  Aⁿ  Aⁿ  Aⁿ  Aⁿ
 aⁿ  aⁿ  aⁿ  aⁿ  aⁿ  aⁿ  aⁿ  aⁿ  aⁿ
 Iⁿ  Iⁿ  Iⁿ  Iⁿ  Iⁿ  Iⁿ  Iⁿ  Iⁿ  Iⁿ
@@ -183,10 +165,7 @@ eⁿ  eⁿ  eⁿ  eⁿ  eⁿ  eⁿ  eⁿ  eⁿ  eⁿ`,
                 en: 'Nasal Diphthongs (Aiⁿ, Auⁿ, Iaⁿ, Iuⁿ...)',
                 poj: 'Phīⁿ-im Hòa Ho̍k Bó-im Jī-bóe (Aiⁿ, Auⁿ, Iaⁿ, Iuⁿ...)'
             },
-            page_title: {
-                en: 'POJ Nasal Diphthongs',
-                poj: 'Phīⁿ-im Hòa Ho̍k Bó-im Jī-bóe'
-            },
+            page_title: 'Phīⁿ-im Hòa Ho̍k Bó-im Jī-bóe',
             text: `Aiⁿ  Aiⁿ  Aiⁿ  Aiⁿ  Aiⁿ  Aiⁿ  Aiⁿ
 aiⁿ  aiⁿ  aiⁿ  aiⁿ  aiⁿ  aiⁿ  aiⁿ
 Auⁿ  Auⁿ  Auⁿ  Auⁿ  Auⁿ  Auⁿ
@@ -218,10 +197,7 @@ oaiⁿ  oaiⁿ  oaiⁿ  oaiⁿ  oaiⁿ  oaiⁿ`,
                 en: 'Nasal Codas (-m, -n, -ng)',
                 poj: 'Phīⁿ Chú-im Bóe-liu Jī-bóe (-m, -n, -ng)'
             },
-            page_title: {
-                en: 'POJ Nasal Codas',
-                poj: 'Phīⁿ Chú-im Bóe-liu Jī-bóe'
-            },
+            page_title: 'Phīⁿ Chú-im Bóe-liu Jī-bóe',
             text: `Am Am Am Am  am am am am
 An An An An  an an an an an
 Ang Ang Ang  ang ang ang
@@ -251,10 +227,7 @@ Eng Eng Eng  eng eng eng eng`,
                 en: 'Basic Stop Codas (ap, at, ak, ah, ip, it...)',
                 poj: 'Ki-pún Sok-im Jī-bóe (ap, at, ak, ah, ip, it...)'
             },
-            page_title: {
-                en: 'Basic Stop Codas',
-                poj: 'Ki-pún Sok-im Jī-bóe'
-            },
+            page_title: 'Ki-pún Sok-im Jī-bóe',
             text: `Ap Ap Ap Ap  ap ap ap ap ap
 At At At At At  at at at at at
 Ak Ak Ak Ak Ak  ak ak ak ak ak
@@ -282,13 +255,10 @@ Oh Oh Oh Oh  oh oh oh oh oh`,
         // PTK stop codas practice
         'ptk_stop_codas': {
             preset_name: {
-                en: 'PTK Stop Codas (Ap, At, Ak, Ip, It...)',
-                poj: 'PTK Sok-im Jī-bóe (Ap, At, Ak, Ip, It...)'
+                en: 'PTK Stop Codas (-p, -t, -k)',
+                poj: 'PTK Sok-im Jī-bóe (-p, -t, -k)'
             },
-            page_title: {
-                en: 'PTK Stop Codas',
-                poj: 'PTK Sok-im Jī-bóe'
-            },
+            page_title: 'PTK Sok-im Jī-bóe',
             text: `Ap Ap Ap Ap  ap ap ap ap ap
 At At At At At  at at at at at
 Ak Ak Ak Ak Ak  ak ak ak ak ak
@@ -312,7 +282,9 @@ Ek Ek Ek Ek Ek  ek ek ek ek ek`,
             textStyle: 'grey',
             practiceMode: 'tracing',
             followingLines: 'fill'
-        }
+        },
+
+
     };
 
     window.App.Data.Presets = PRESETS;

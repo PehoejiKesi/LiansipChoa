@@ -116,7 +116,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     const Presets = window.App.Data.Presets;
                     const currentPreset = ui.presetSelect.value;
                     if (currentPreset !== 'custom' && Presets && Presets[currentPreset]) {
-                        ui.pageTitle.value = Presets[currentPreset].page_title[lang] || Presets[currentPreset].page_title.poj;
+                        ui.pageTitle.value = Presets[currentPreset].page_title;
                     }
 
                     // Re-populate preset dropdown options to show correct language
@@ -181,8 +181,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (ui.practiceMode && preset.practiceMode) ui.practiceMode.value = preset.practiceMode;
                 if (ui.followingLines && preset.followingLines) ui.followingLines.value = preset.followingLines;
 
-                const lang = window.App.Data.currentLanguage || 'poj';
-                if (ui.pageTitle) ui.pageTitle.value = preset.page_title[lang] || preset.page_title.poj;
+                if (ui.pageTitle) ui.pageTitle.value = preset.page_title;
                 if (ui.inputText) ui.inputText.value = preset.text;
 
                 updatePreview(ui);
